@@ -1,6 +1,5 @@
 import React from "react";
 import Cart from "../pages/cart/Cart";
-import Checkout from "../pages/checkout/Checkout";
 import Home from "../pages/home/Home";
 import ItemDetail from "../components/pageComponents/itemDetail/ItemDetail";
 import ItemListContainer from "../containers/itemlist/ItemListContainer";
@@ -32,11 +31,6 @@ export const routes: Route[] = [
     id: "cart",
     path: "/cart",
     Element: Cart,
-  },
-  {
-    id: "checkout",
-    path: "/checkout",
-    Element: Checkout,
   },
   {
     id: "userOrders",

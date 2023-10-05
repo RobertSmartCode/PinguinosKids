@@ -15,6 +15,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 
+import "./Checkout.css"; // Importa el archivo de estilos
 interface Product {
   id: number;
   title: string;
@@ -52,9 +53,10 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     // ACA ES DONDE GUARDAMOS LA ORDEN EN FIREBASE
     // CONDICIONADO A QUE YA ESTE EL PAGO REALIZADO
-    let order = JSON.parse(localStorage.getItem("order") || "");
-    if (paramValue === "approved") {
-      let ordersCollection = collection(db, "orders");
+    const orderData = localStorage.getItem("order");
+    if (paramValue === "approved" && orderData) {
+      const order: Order = JSON.parse(orderData);
+      const ordersCollection = collection(db, "orders");
       addDoc(ordersCollection, { ...order, date: serverTimestamp() }).then(
         (res) => {
           setOrderId(res.id);
@@ -70,17 +72,17 @@ const Checkout: React.FC = () => {
       localStorage.removeItem("order");
       clearCart();
     }
-  }, [paramValue]);
+  }, [paramValue, clearCart]);
 
   useEffect(() => {
-    let shipmentCollection = collection(db, "shipment");
-    let shipmentDoc = doc(shipmentCollection, "HxMuNKLUglVoHjAyosML");
+    const shipmentCollection = collection(db, "shipment");
+    const shipmentDoc = doc(shipmentCollection, "HxMuNKLUglVoHjAyosML");
     getDoc(shipmentDoc).then((res) => {
       setShipmentCost(res.data()?.cost);
     });
   }, []);
 
-  let total = getTotalPrice();
+  const total = getTotalPrice();
 
   const createPreference = async () => {
     const newArray = cart.map((product) => {
@@ -91,7 +93,7 @@ const Checkout: React.FC = () => {
       };
     });
     try {
-      let response = await axios.post(
+      const response = await axios.post(
         "https://back-ecommerce-nu.vercel.app/create_preference",
         {
           items: newArray,
@@ -107,10 +109,16 @@ const Checkout: React.FC = () => {
   };
 
   const handleBuy = async () => {
-    let order: Order = {
+    const order: Order = {
       cp: userData.cp,
       phone: userData.phone,
-      items: cart,
+      items: cart.map((item) => ({
+        id: Number(item.id), // Convierte el id a número si es necesario
+        title: item.title,
+        unit_price: item.unit_price,
+        quantity: item.quantity,
+        stock: 0, // Valor predeterminado para stock
+      })),
       total: total + shipmentCost,
       email: user?.email || "",
     };
@@ -126,7 +134,7 @@ const Checkout: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="checkout-container">
       {!orderId ? (
         <>
           <TextField

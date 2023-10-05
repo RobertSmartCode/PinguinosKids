@@ -4,6 +4,7 @@ import { routes } from "./routes";
 import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
 import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
+import Checkout from "../pages/checkout/Checkout";
 import Dashboard from "../pages/dashboard/Dashboard";
 import UserOrders from "../pages/UserAccount/UserAccount";
 import ProtectedAdmin from "./ProtectedAdmin";
@@ -44,6 +45,9 @@ const AppRouter = () => {
 
       {/* forgot password  */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
+
+       {/* Checkout */}
+       <Route path="/checkout" element={<Checkout />} /> 
 
       <Route path="*" element={<h1>Not found</h1>} />
     </Routes>
