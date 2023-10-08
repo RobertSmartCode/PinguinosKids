@@ -41,8 +41,19 @@ interface CartContextData {
   selectedShippingMethod: ShippingMethod | null;
   shippingCost: number;
   updateShippingInfo: (method: ShippingMethod, cost: number) => void;
-  getSelectedShippingMethod: () => ShippingMethod | null; // Agrega esta línea
-  getShippingCost: () => number; // Agrega esta línea
+  getSelectedShippingMethod: () => ShippingMethod | null;
+  getShippingCost: () => number;
+  discountInfo: {
+    createdAt: Date | null;
+    discountPercentage: number | null;
+    duration: number | null;
+    maxDiscountAmount: number | null;
+    minPurchaseAmount: number | null;
+    promoCode: string;
+    isValid: boolean;
+  };
+  updateDiscountInfo: (newDiscountInfo: Partial<CartContextData["discountInfo"]>) => void;
+
 }
 
 export interface ShippingMethod {
@@ -51,6 +62,18 @@ export interface ShippingMethod {
   price: number;
   selected: boolean;
 }
+
+
+interface DiscountInfo {
+  createdAt: Date | null;
+  discountPercentage: number | null;
+  duration: number | null;
+  maxDiscountAmount: number | null;
+  minPurchaseAmount: number | null;
+  promoCode: string;
+  isValid: boolean;
+}
+
 
 
 
@@ -174,6 +197,25 @@ const getShippingCost = () => {
     return total;
   };
 
+
+  const [discountInfo, setDiscountInfo] = useState<DiscountInfo>({
+    createdAt: null,
+    discountPercentage: null,
+    duration: null,
+    maxDiscountAmount: null,
+    minPurchaseAmount: null,
+    promoCode: "",
+    isValid: false,
+  });
+  
+  const updateDiscountInfo = (newDiscountInfo: Partial<DiscountInfo>) => {
+    setDiscountInfo((prevDiscountInfo) => ({
+      ...prevDiscountInfo,
+      ...newDiscountInfo,
+    }));
+  };
+  
+
   const data: CartContextData = {
     cart,
     addToCart,
@@ -189,6 +231,8 @@ const getShippingCost = () => {
     updateShippingInfo, // Agregamos updateShippingInfo
     getSelectedShippingMethod, // Agregamos esta función
     getShippingCost, // Agregamos esta función
+    discountInfo, // Agregamos la información del descuento
+    updateDiscountInfo,
   };
 
   return <CartContext.Provider value={data}>{children}</CartContext.Provider>;

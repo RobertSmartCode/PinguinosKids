@@ -16,7 +16,8 @@ import { CartContext } from '../../context/CartContext';
 
 
 const CartCheckout = () => {
-  const { cart, getSelectedShippingMethod } = useContext(CartContext)! || {};
+
+  const { cart, getSelectedShippingMethod, getTotalPrice, discountInfo } = useContext(CartContext)! || {};
   const [productCounters, setProductCounters] = useState<{ [key: string]: number }>({});
 
 
@@ -28,23 +29,22 @@ const CartCheckout = () => {
   };
 
   // Función para calcular el subtotal sin envío
-  const calculateSubtotal = () => {
-    let subtotal = 0;
-    cart.forEach((product) => {
-      subtotal += product.unit_price * productCounters[product.id];
-    });
-    return subtotal;
-  };
-
+  const subtotal = getTotalPrice ? getTotalPrice() : 0;
 
   
   const selectedShippingMethod= getSelectedShippingMethod()
-
   
   const shippingCost = selectedShippingMethod ? selectedShippingMethod.price : 0;
   
+    // Accede al valor del porcentaje de descuento
+    const discountPercentage = discountInfo ? discountInfo.discountPercentage : 0;
+
+
+
   // Calcular el total sumando el subtotal y el costo de envío
-  const total = calculateSubtotal() + shippingCost;
+  const total = (subtotal + shippingCost) * (1 - (discountPercentage ?? 0) / 100);
+
+
 
   useEffect(() => {
     // Inicializa los contadores para cada producto en el carrito
@@ -149,7 +149,7 @@ const CartCheckout = () => {
                   Sub Total (Sin Envío)
                 </Typography>
                 <Typography variant="body1" style={{ paddingRight: '30px' }}>
-                  ${calculateSubtotal()}
+                  ${subtotal}
                 </Typography>
               </Grid>
               <Grid
