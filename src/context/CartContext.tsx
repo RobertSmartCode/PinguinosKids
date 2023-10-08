@@ -38,7 +38,21 @@ interface CartContextData {
   getTotalQuantity: () => number;
   productQuantities: { [key: string]: number };
   updateQuantityById: (id: string, newQuantity: number) => void;
+  selectedShippingMethod: ShippingMethod | null;
+  shippingCost: number;
+  updateShippingInfo: (method: ShippingMethod, cost: number) => void;
+  getSelectedShippingMethod: () => ShippingMethod | null; // Agrega esta línea
+  getShippingCost: () => number; // Agrega esta línea
 }
+
+export interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
+}
+
+
 
 export const CartContext = createContext<CartContextData | undefined>(undefined);
 
@@ -47,8 +61,25 @@ interface CartContextComponentProps {
 }
 
 const CartContextComponent: React.FC<CartContextComponentProps> = ({ children }) => {
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [productQuantities, setProductQuantities] = useState<{ [key: string]: number }>({});
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
+  const [shippingCost, setShippingCost] = useState<number>(0);
+
+
+const updateShippingInfo = (method: ShippingMethod, cost: number) => {
+  setSelectedShippingMethod(method);
+  setShippingCost(cost);
+};
+
+const getSelectedShippingMethod = () => {
+  return selectedShippingMethod;
+};
+
+const getShippingCost = () => {
+  return shippingCost;
+};
 
   // Cargar el carrito y las cantidades desde el almacenamiento local al inicio
   useEffect(() => {
@@ -153,6 +184,11 @@ const CartContextComponent: React.FC<CartContextComponentProps> = ({ children })
     getTotalQuantity,
     productQuantities,
     updateQuantityById,
+    selectedShippingMethod, // Agregamos selectedShippingMethod
+    shippingCost, // Agregamos shippingCost
+    updateShippingInfo, // Agregamos updateShippingInfo
+    getSelectedShippingMethod, // Agregamos esta función
+    getShippingCost, // Agregamos esta función
   };
 
   return <CartContext.Provider value={data}>{children}</CartContext.Provider>;

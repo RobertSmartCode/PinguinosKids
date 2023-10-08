@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-
   Card,
   CardContent,
-
-
   CardActions,
   Snackbar,
   Box,
@@ -19,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import StoreDataForm from "./StoreDataForm"; // Importa el formulario de datos de la tienda
+
 
 // Define el tipo StoreData (ajusta las propiedades según las necesidades)
 interface StoreData {

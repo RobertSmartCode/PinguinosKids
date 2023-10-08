@@ -36,7 +36,8 @@ const MobileCart: React.FC<MobileCartProps> = () => {
 
 
   
-  const { cart, getTotalPrice, getTotalQuantity } = useContext(CartContext) ?? {};
+  const { cart, getTotalPrice, getTotalQuantity,  updateShippingInfo } = useContext(CartContext)! ?? {};
+
 
   const handleCartClick = () => {
     setCartOpen(!cartOpen);
@@ -52,8 +53,9 @@ const total = subtotal + shippingCost;
 
 const handleShippingMethodSelect = (method: ShippingMethod) => {
   setSelectedShippingMethod(method);
-};
+  updateShippingInfo(method, method.price);
 
+};
   const customColors = {
     primary: {
       main: '#000',
@@ -174,7 +176,10 @@ const handleShippingMethodSelect = (method: ShippingMethod) => {
           {cart?.length ?? 0 > 0 ? (
             <>
               <CartItemList />
-              <ShippingMethods onSelectMethod={handleShippingMethodSelect} />
+              <ShippingMethods
+              onSelectMethod={handleShippingMethodSelect}
+              initialSelectedMethod={selectedShippingMethod}
+            />
               <Box  style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography style={{ fontSize: '1.2rem', fontWeight: 'bold', paddingLeft: '30px' }}>Total:</Typography>
               <Typography style={{ fontSize: '1.2rem', fontWeight: 'bold', paddingRight: '50px' }}>${total}</Typography>

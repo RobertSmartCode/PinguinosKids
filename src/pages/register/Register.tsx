@@ -36,7 +36,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    let res = await signUp(userCredentials);
+    const res = await signUp(userCredentials);
     if (res.user.uid) {
       await setDoc(doc(db, "users", res.user.uid), { rol: "user" });
     }

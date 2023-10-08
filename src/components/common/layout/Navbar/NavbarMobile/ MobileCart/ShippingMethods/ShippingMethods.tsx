@@ -18,14 +18,23 @@ interface ShippingMethod {
 
 interface ShippingMethodsProps {
   onSelectMethod: (method: ShippingMethod) => void;
+  initialSelectedMethod: ShippingMethod | null; // Nueva prop
 }
 
-const ShippingMethods: React.FC<ShippingMethodsProps> = ({ onSelectMethod }) => {
+const ShippingMethods: React.FC<ShippingMethodsProps> = ({ onSelectMethod,initialSelectedMethod }) => {
   const [methods, setMethods] = useState<ShippingMethod[]>([]);
 
   useEffect(() => {
     fetchShippingMethods();
   }, []);
+
+  // Lógica para establecer el método de envío inicial si existe
+  if (initialSelectedMethod) {
+    const initialMethod = methods.find((m) => m.id === initialSelectedMethod.id);
+    if (initialMethod) {
+      initialMethod.selected = true;
+    }
+  }
 
   const fetchShippingMethods = async () => {
     try {
