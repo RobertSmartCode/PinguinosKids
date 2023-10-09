@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Box, Drawer, Typography, IconButton } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import PromoCodeForm from "./PromoCodeForm"
-
+import PromoCodeList from "./PromoCodeList"
 
 
 
@@ -11,7 +11,11 @@ const PromoCode: React.FC = () => {
   
   const [open, setOpen] = useState<boolean>(false);
 
+  const [showForm, setShowForm] = useState<boolean>(false);
 
+  const handleCreateCouponClick = () => {
+    setShowForm(!showForm);
+  };
 
 
 
@@ -22,6 +26,7 @@ const PromoCode: React.FC = () => {
 
   const handleClose = () => {
     setOpen(false);
+    
   };
 
  
@@ -96,13 +101,27 @@ const PromoCode: React.FC = () => {
           <Typography variant="h6" sx={textStyles}>Configuración de Cupones</Typography>
           <IconButton
             aria-label="close"
-            onClick={handleClose}
+            onClick={() => {
+              handleClose();
+              setShowForm(false); // Agrega esta línea para cerrar el formulario
+            }}
             sx={closeButtonStyles}
           >
             <CloseIcon />
           </IconButton>
         </Box>
-        <PromoCodeForm/>
+        <Box>
+            <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateCouponClick}
+             >
+            {showForm ? 'Cerrar Formulario' : 'Crear Cupón'}
+          </Button>
+          {showForm && <PromoCodeForm />}
+        </Box>
+       
+        <PromoCodeList/>
       </Drawer>
     </Box>
   );

@@ -18,7 +18,7 @@ import {
 import BannerSecure from "./BannerSecure"
 import Banner from "./Banner"
 import CartCheckout from './CartCheckout '; 
-import ShippingMethods from '../../components/common/layout/Navbar/NavbarMobile/ MobileCart/ShippingMethods/ShippingMethods'; 
+import ShippingMethodCheckout from './ShippingMethodCheckout'; 
 import CouponValidation from './CuponValidation'; 
 
 interface Product {
@@ -179,7 +179,7 @@ const Checkout: React.FC = () => {
             <Banner/>
             <CartCheckout />
             <CouponValidation />
-            <ShippingMethods
+            <ShippingMethodCheckout
               onSelectMethod={handleShippingMethodSelect}
               initialSelectedMethod={selectedShippingMethod}
             />

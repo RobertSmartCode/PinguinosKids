@@ -36,14 +36,19 @@ const CartCheckout = () => {
   
   const shippingCost = selectedShippingMethod ? selectedShippingMethod.price : 0;
   
-    // Accede al valor del porcentaje de descuento
-    const discountPercentage = discountInfo ? discountInfo.discountPercentage : 0;
 
 
+  const discountPercentage = discountInfo?.discountPercentage ?? 0;
+  const maxDiscountAmount = discountInfo?.maxDiscountAmount ?? 0;
+  const discountAmount = (discountPercentage / 100) * (subtotal + shippingCost);
+ 
+  let total = (subtotal + shippingCost) * (1 - (discountPercentage ?? 0) / 100);
 
-  // Calcular el total sumando el subtotal y el costo de envío
-  const total = (subtotal + shippingCost) * (1 - (discountPercentage ?? 0) / 100);
-
+  if (discountAmount < maxDiscountAmount) {
+    total = (subtotal + shippingCost) * (1 - discountPercentage / 100);
+  } else {
+    total = subtotal + shippingCost - maxDiscountAmount;
+  }
 
 
   useEffect(() => {

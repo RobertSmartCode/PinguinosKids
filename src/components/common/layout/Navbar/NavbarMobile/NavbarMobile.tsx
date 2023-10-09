@@ -17,7 +17,7 @@ import { Link, Outlet } from "react-router-dom";
 import MobileMenuList from "./MobileMenuList/MobileMenuList";
 import MobileLogo from "./MobileLogo/MobileLogo";
 import SearchBar from "./SearchBar/SearchBar";
-import MobileCart from './ MobileCart/MobileCart';
+import MobileCart from './MobileCart/MobileCart';
 
 // Define colores personalizados
 const customColors = {

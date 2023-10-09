@@ -5,38 +5,32 @@ import { db } from '../../firebase/firebaseConfig';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { CartContext } from '../../context/CartContext';
-interface CouponDiscount {
-  promoCode: string; // Cambia el nombre de la propiedad a promoCode
-  discountPercentage: number; // Cambia el nombre de la propiedad a discountPercentage
 
-  createdAt: Date; // Agrega la propiedad createdAt
-  duration: number; // Agrega la propiedad duration
-  maxDiscountAmount: number; // Agrega la propiedad maxDiscountAmount
-  minPurchaseAmount: number; // Agrega la propiedad minPurchaseAmount
+interface CouponDiscount {
+  promoCode: string;
+  discountPercentage: number;
+  createdAt: Date;
+  duration: number;
+  maxDiscountAmount: number;
+  minPurchaseAmount: number;
 }
 
 type ValidateCouponFunction = (couponCode: string) => Promise<CouponDiscount | null>;
 
 const CouponValidation: React.FC = () => {
-
-  const { updateDiscountInfo, getTotalPrice, getSelectedShippingMethod, discountInfo  } = useContext(CartContext)! || {};
+  const { updateDiscountInfo, getTotalPrice, getSelectedShippingMethod, discountInfo } =
+    useContext(CartContext)! || {};
 
   const [isCouponValid, setIsCouponValid] = useState(false);
   const [couponInfo, setCouponInfo] = useState<CouponDiscount | null>(null);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null); // Agregar estado para el mensaje de error
+  const [customError, setCustomError] = useState<string | null>(null);
 
-
-  
-  // Función para calcular el subtotal sin envío
   const subtotal = getTotalPrice ? getTotalPrice() : 0;
-  
-  const selectedShippingMethod= getSelectedShippingMethod()
-
-  
+  const selectedShippingMethod = getSelectedShippingMethod();
   const shippingCost = selectedShippingMethod ? selectedShippingMethod.price : 0;
-  
-  // Calcular el total sumando el subtotal y el costo de envío
-  const total = subtotal  + shippingCost;
+  const total = subtotal + shippingCost;
 
   const validationSchema = Yup.object({
     couponCode: Yup.string().required('El código del cupón es requerido'),
@@ -53,9 +47,12 @@ const CouponValidation: React.FC = () => {
       if (validatedCoupon) {
         setIsCouponValid(true);
         setCouponInfo(validatedCoupon);
+        setValidationError(null); // Reiniciar el mensaje de error
       } else {
+        const errorMessage = 'El cupón ingresado no es válido.';
         setShowValidationAlert(true);
-
+        
+        setValidationError(errorMessage); // Actualizar el mensaje de error
         setTimeout(() => {
           setShowValidationAlert(false);
           formik.resetForm();
@@ -63,6 +60,7 @@ const CouponValidation: React.FC = () => {
       }
     },
   });
+
   const validateCoupon: ValidateCouponFunction = async (couponCodeToValidate) => {
     try {
       const couponsCollection = collection(db, 'promoCodes');
@@ -71,10 +69,8 @@ const CouponValidation: React.FC = () => {
       );
   
       if (querySnapshot.size === 1) {
-        // Obtiene el documento del cupón encontrado
         const couponDoc = querySnapshot.docs[0];
   
-        // Verifica si el documento contiene los campos necesarios
         if (
           couponDoc.data().promoCode &&
           couponDoc.data().discountPercentage !== null &&
@@ -83,7 +79,6 @@ const CouponValidation: React.FC = () => {
           couponDoc.data().maxDiscountAmount !== null &&
           couponDoc.data().minPurchaseAmount !== null
         ) {
-          // Extrae los valores específicos del documento
           const promoCode = couponDoc.data().promoCode;
           const discountPercentage = couponDoc.data().discountPercentage;
           const createdAt = couponDoc.data().createdAt.toDate();
@@ -91,23 +86,17 @@ const CouponValidation: React.FC = () => {
           const maxDiscountAmount = couponDoc.data().maxDiscountAmount;
           const minPurchaseAmount = couponDoc.data().minPurchaseAmount;
   
-          // Verifica si el cupón ha caducado
           const currentDate = new Date();
           const couponExpirationDate = new Date(createdAt);
           couponExpirationDate.setDate(couponExpirationDate.getDate() + duration);
   
           if (currentDate <= couponExpirationDate) {
-            // Calcula el descuento
-            console.log(total)
             const discountAmount = (discountPercentage / 100) * total;
   
-            // Aplica el descuento máximo
             const newTotal =
               discountAmount > maxDiscountAmount ? total - maxDiscountAmount : total - discountAmount;
   
-            // Verifica el monto mínimo de compra
             if (newTotal >= minPurchaseAmount) {
-              // El cupón es válido, aplica el descuento
               const newDiscountInfo = {
                 promoCode,
                 discountPercentage,
@@ -118,28 +107,41 @@ const CouponValidation: React.FC = () => {
                 isValid: true,
               };
   
-              // Llama a updateDiscountInfo para actualizar la información del descuento en el contexto
               updateDiscountInfo(newDiscountInfo);
-  
-              // Devuelve el objeto compatible con la interfaz CouponDiscount
               return newDiscountInfo;
-            } else {
-              // El monto mínimo de compra no se cumple
-              console.error('El monto mínimo de compra no se cumple.');
+            } else {             
+              const errorMessage = 'El monto mínimo de compra no se cumple.';
+             
+              setShowValidationAlert(true);
+              setCustomError(errorMessage);
+  
+              // Ocultar la alerta y limpiar el error personalizado después de 1 segundo
+              setTimeout(() => {
+                setShowValidationAlert(false);
+                setCustomError(null);
+              }, 1000);
+  
               return null;
             }
           } else {
-            // El cupón ha caducado
-            console.error('El cupón ha caducado.');
+            const errorMessage = 'El cupón ha caducado.';
+            
+            setShowValidationAlert(true);
+            setCustomError(errorMessage);
+  
+            // Ocultar la alerta y limpiar el error personalizado después de 1 segundo
+            setTimeout(() => {
+              setShowValidationAlert(false);
+              setCustomError(null);
+            }, 1000);
+  
             return null;
           }
         } else {
-          // Los campos necesarios no están presentes en el documento
           console.error('El documento de cupón no contiene todos los campos necesarios.');
           return null;
         }
       } else {
-        // No se encontró un cupón con el código proporcionado
         return null;
       }
     } catch (error) {
@@ -147,11 +149,20 @@ const CouponValidation: React.FC = () => {
       return null;
     }
   };
+  
+  let discountPercentage = discountInfo?.discountPercentage ?? 0;
+  const maxDiscountAmount = discountInfo?.maxDiscountAmount ?? 0;
+  const discountAmount = (discountPercentage / 100) * (subtotal + shippingCost);
+  let newTotal;
+  
+  if (discountAmount < maxDiscountAmount) {
+    newTotal = (subtotal + shippingCost) * (1 - discountPercentage / 100);
+  } else {
+    newTotal = subtotal + shippingCost - maxDiscountAmount;
+    discountPercentage = Math.floor((1 - newTotal / (subtotal + shippingCost)) * 100);
 
-  const discountPercentage = discountInfo ? discountInfo.discountPercentage : 0;
 
-  const newTotal = (subtotal + shippingCost) * (1 - (discountPercentage ?? 0) / 100);
- 
+  }
   
   return (
     <Box display="flex" flexDirection="column" alignItems="center" margin="0 25px" marginTop="30px" marginBottom="30px">
@@ -182,24 +193,29 @@ const CouponValidation: React.FC = () => {
         }}
       />
 
-      {showValidationAlert && (
-        <Typography variant="body1" style={{ color: 'red', marginTop: '8px' }}>
-          El cupón ingresado no es válido.
-        </Typography>
-      )}
+        {validationError && showValidationAlert && (
+          <Typography variant="body1" style={{ color: 'red', marginTop: '8px' }}>
+            {validationError}
+          </Typography>
+        )}
+
+        {customError && (
+          <Typography variant="body1" style={{ color: 'red', marginTop: '8px' }}>
+            {customError}
+          </Typography>
+        )}
+
 
       {isCouponValid && couponInfo && (
-       <Box mt={2}>
-       <Typography variant="subtitle1">Descuento Aplicado:</Typography>
-       <Typography variant="body1" style={{ color: 'black' }}>
-         Se aplicó un descuento del {couponInfo.discountPercentage}%.
-       </Typography>
-       <Typography variant="body1" style={{ color: 'black' }}>
-         <span style={{ textDecoration: 'line-through' }}>${total.toFixed(2)}</span> ${newTotal.toFixed(2)}
-       </Typography>
-     </Box>
-     
-      
+        <Box mt={2}>
+          <Typography variant="subtitle1">Descuento Aplicado:</Typography>
+          <Typography variant="body1" style={{ color: 'black' }}>
+            Se aplicó un descuento del {discountPercentage}%.
+          </Typography>
+          <Typography variant="body1" style={{ color: 'black' }}>
+            <span style={{ textDecoration: 'line-through' }}>${total.toFixed(2)}</span> ${newTotal.toFixed(2)}
+          </Typography>
+        </Box>
       )}
     </Box>
   );
