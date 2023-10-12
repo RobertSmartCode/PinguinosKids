@@ -5,6 +5,7 @@ import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
 import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
 import Checkout from "../pages/checkout/Checkout";
+import CheckoutNext from "../pages/checkout/CheckoutNext";
 import Dashboard from "../pages/dashboard/Dashboard";
 import UserOrders from "../pages/UserAccount/UserAccount";
 import ProtectedAdmin from "./ProtectedAdmin";
@@ -48,6 +49,9 @@ const AppRouter = () => {
 
        {/* Checkout */}
        <Route path="/checkout" element={<Checkout />} /> 
+
+       {/* CheckoutNext */}
+       <Route path="/checkout/next" element={<CheckoutNext />} /> 
 
       <Route path="*" element={<h1>Not found</h1>} />
     </Routes>

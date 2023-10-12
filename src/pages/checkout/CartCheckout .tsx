@@ -174,6 +174,30 @@ const CartCheckout = () => {
                   ${shippingCost}
                 </Typography>
               </Grid>
+              {discountPercentage > 0 && (
+              <Grid
+                item
+                xs={12}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography variant="body2" style={{ paddingLeft: '20px' }}>
+                  {discountAmount < maxDiscountAmount ? 'Descuento (Cupón)' : 'Descuento Máximo (Cupón)'}
+                </Typography>
+                <Typography variant="body1" style={{ paddingRight: '30px' }}>
+                  -${discountAmount < maxDiscountAmount ? discountAmount.toFixed(2) : maxDiscountAmount.toFixed(2)} {/* Muestra la cantidad descontada */}
+                </Typography>
+              </Grid>
+            )}
+
+
+
+
+              
               <Grid
                 item
                 xs={12}

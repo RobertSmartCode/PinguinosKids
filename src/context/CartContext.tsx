@@ -53,8 +53,12 @@ interface CartContextData {
     isValid: boolean;
   };
   updateDiscountInfo: (newDiscountInfo: Partial<CartContextData["discountInfo"]>) => void;
-
+  setCustomerInformation: (info: CustomerInfo) => void;
+  updateCustomerInformation: (info: Partial<CustomerInfo>) => void; 
+  getCustomerInformation: () => CustomerInfo | null; 
 }
+
+
 
 export interface ShippingMethod {
   id: string;
@@ -74,6 +78,24 @@ interface DiscountInfo {
   isValid: boolean;
 }
 
+interface CustomerInfo {
+  email: string;
+  receiveOffers: boolean;
+  country: string;
+  identificationDocument: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  isOtherPerson: boolean;
+  otherPersonFirstName?: string;
+  otherPersonLastName?: string;
+  streetAndNumber: string;
+  department?: string;
+  neighborhood?: string;
+  city: string;
+  postalCode: string;
+  province: string;
+}
 
 
 
@@ -89,6 +111,7 @@ const CartContextComponent: React.FC<CartContextComponentProps> = ({ children })
   const [productQuantities, setProductQuantities] = useState<{ [key: string]: number }>({});
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
   const [shippingCost, setShippingCost] = useState<number>(0);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
 
 const updateShippingInfo = (method: ShippingMethod, cost: number) => {
@@ -102,6 +125,22 @@ const getSelectedShippingMethod = () => {
 
 const getShippingCost = () => {
   return shippingCost;
+};
+
+const setCustomerInformation = (info: CustomerInfo) => {
+  setCustomerInfo(info);
+};
+
+const getCustomerInformation = () => {
+  return customerInfo;
+};
+
+
+const updateCustomerInformation = (info: Partial<CustomerInfo>) => {
+  if (customerInfo) {
+    const updatedInfo = { ...customerInfo, ...info };
+    setCustomerInformation(updatedInfo);
+  }
 };
 
   // Cargar el carrito y las cantidades desde el almacenamiento local al inicio
@@ -233,6 +272,9 @@ const getShippingCost = () => {
     getShippingCost, // Agregamos esta función
     discountInfo, // Agregamos la información del descuento
     updateDiscountInfo,
+    setCustomerInformation,
+    getCustomerInformation,
+    updateCustomerInformation
   };
 
   return <CartContext.Provider value={data}>{children}</CartContext.Provider>;

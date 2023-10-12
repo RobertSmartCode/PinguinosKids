@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { TextField, Box, Typography, Avatar } from '@mui/material';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { useFormik } from 'formik';
+import { useFormik,  FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { CartContext } from '../../context/CartContext';
 
@@ -26,6 +26,7 @@ const CouponValidation: React.FC = () => {
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null); // Agregar estado para el mensaje de error
   const [customError, setCustomError] = useState<string | null>(null);
+  const [showDiscountMessage, setShowDiscountMessage] = useState(false);
 
   const subtotal = getTotalPrice ? getTotalPrice() : 0;
   const selectedShippingMethod = getSelectedShippingMethod();
@@ -41,13 +42,25 @@ const CouponValidation: React.FC = () => {
       couponCode: '',
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }: FormikHelpers<any>) => {
       const validatedCoupon = await validateCoupon(values.couponCode);
 
       if (validatedCoupon) {
         setIsCouponValid(true);
         setCouponInfo(validatedCoupon);
         setValidationError(null); // Reiniciar el mensaje de error
+        
+        
+        // Mostrar el mensaje de descuento aplicado
+        setShowDiscountMessage(true);
+
+        // Ocultar el mensaje de descuento aplicado después de 1 segundo
+        setTimeout(() => {
+          setShowDiscountMessage(false);
+        }, 2000);
+        
+        resetForm();
+
       } else {
         const errorMessage = 'El cupón ingresado no es válido.';
         setShowValidationAlert(true);
@@ -174,7 +187,7 @@ const CouponValidation: React.FC = () => {
         value={formik.values.couponCode}
         onChange={formik.handleChange}
         error={formik.touched.couponCode && Boolean(formik.errors.couponCode)}
-        helperText={formik.touched.couponCode && formik.errors.couponCode}
+        helperText={formik.touched.couponCode ? (formik.errors.couponCode as string) : ''}
         className={formik.errors.couponCode ? 'errorBorder' : ''}
         InputProps={{
           endAdornment: (
@@ -206,7 +219,7 @@ const CouponValidation: React.FC = () => {
         )}
 
 
-      {isCouponValid && couponInfo && (
+      {showDiscountMessage && isCouponValid && couponInfo && (
         <Box mt={2}>
           <Typography variant="subtitle1">Descuento Aplicado:</Typography>
           <Typography variant="body1" style={{ color: 'black' }}>
@@ -218,6 +231,9 @@ const CouponValidation: React.FC = () => {
         </Box>
       )}
     </Box>
+
+
+     
   );
 };
 

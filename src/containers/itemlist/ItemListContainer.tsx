@@ -133,7 +133,7 @@ const ItemListContainer: React.FC = () => {
   
     // Llama a la función addToCart del contexto para agregar el producto al carrito
     addToCart(cartItem);
-    console.log(cartItem)
+   
   };
   
 

@@ -28,6 +28,7 @@ const CartItemList = () => {
     return subtotal;
   };
 
+
   useEffect(() => {
     // Inicializa los contadores para cada producto en el carrito
     const initialCounters: { [key: string]: number } = {};
