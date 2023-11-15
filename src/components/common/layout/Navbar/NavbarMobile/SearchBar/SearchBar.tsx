@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
@@ -6,19 +6,36 @@ import CloseIcon from "@mui/icons-material/Close";
 import Drawer from "@mui/material/Drawer";
 import { Box, Typography } from "@mui/material";
 
+import Search from "./Search"; 
+import { useSearchContext } from "../../../../../../context/SearchContext"; 
+
 interface SearchBarProps {
   toggleSearch: () => void;
   isSearchOpen: boolean;
 }
 
+
 const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => {
+
+
+  const {updateSearchKeyword } = useSearchContext()!;
   const [inputValue, setInputValue] = useState("");
 
+
+  useEffect(() => {
+    // Actualiza la palabra clave de búsqueda al valor actual de inputValue
+    updateSearchKeyword(inputValue);
+  }, [inputValue, updateSearchKeyword]);
+
+
+
+  
   const handleSearchClick = () => {
-    // Aquí puedes manejar la lógica de búsqueda con el valor de inputValue
-    // Por ejemplo, puedes realizar una búsqueda al presionar el botón de búsqueda.
-    // Luego, puedes cerrar el cuadro de búsqueda usando toggleSearch.
+    // Maneja la lógica de búsqueda utilizando la palabra clave y cierra el cuadro de búsqueda
+    
+    
   };
+
 
   const handleCloseClick = () => {
     setInputValue(""); // Limpiar el valor del campo de búsqueda al cerrar
@@ -145,7 +162,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
             <SearchIcon sx={iconStyles} />
           </IconButton>
         </Box>
+        <Search/>
       </Drawer>
+      
     </Box>
   );
 };

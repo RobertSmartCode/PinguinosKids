@@ -1,6 +1,6 @@
 import HomeIcon from '@mui/icons-material/Home';
 import StoreIcon from '@mui/icons-material/Store';
-// import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
+
 
 
 interface MenuItem {
@@ -23,11 +23,6 @@ export const menuItems: MenuItem[] = [
     title: "Tienda",
     Icon: StoreIcon
   },
-  // {
-  //   id: "cart",
-  //   path: "/cart",
-  //   title: "Carrito",
-  //   Icon: ShoppingCartCheckoutIcon
-  // }
+ 
   
 ];

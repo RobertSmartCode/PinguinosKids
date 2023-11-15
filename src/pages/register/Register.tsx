@@ -51,6 +51,7 @@ const Register: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
+        height: '100vh', 
         padding: "20px", // Padding por defecto
         maxWidth: "600px", // Ancho máximo del contenido
         marginLeft: "auto", // Espacio a la izquierda
@@ -59,6 +60,7 @@ const Register: React.FC = () => {
           paddingLeft: "400px", // Padding a la izquierda para escritorio
           paddingRight: "400px", // Padding a la derecha para escritorio
         }),
+        backgroundColor: "white",
       }}
     >
       <form onSubmit={handleSubmit}>
@@ -69,14 +71,25 @@ const Register: React.FC = () => {
               label="Email"
               fullWidth
               onChange={handleChange}
+              sx={{
+                color: "black",
+                backgroundColor: "white"
+              }}
             />
           </Grid>
           <Grid item xs={10} md={12}>
             <FormControl variant="outlined" fullWidth>
-              <InputLabel htmlFor="outlined-adornment-password">
+              <InputLabel htmlFor="outlined-adornment-password"  sx={{
+                color: "black",
+                
+              }}>
                 Contraseña
               </InputLabel>
               <OutlinedInput
+               sx={{
+                color: "black",
+                backgroundColor: "white"
+              }}
                 id="outlined-adornment-password"
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -89,9 +102,13 @@ const Register: React.FC = () => {
                       edge="end"
                     >
                       {showPassword ? (
-                        <VisibilityOff color="primary" />
+                        <VisibilityOff sx={{
+                          color: "black"
+                        }}  />
                       ) : (
-                        <Visibility color="primary" />
+                        <Visibility sx={{
+                          color: "black"
+                        }} />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -102,10 +119,17 @@ const Register: React.FC = () => {
           </Grid>
           <Grid item xs={10} md={12}>
             <FormControl variant="outlined" fullWidth>
-              <InputLabel htmlFor="outlined-adornment-password">
+              <InputLabel htmlFor="outlined-adornment-password"  sx={{
+                color: "black",
+                backgroundColor: "white"
+              }}>
                 Confirmar contraseña
               </InputLabel>
               <OutlinedInput
+               sx={{
+                color: "black",
+                backgroundColor: "white"
+              }}
                 id="outlined-adornment-password"
                 type={showPassword ? "text" : "password"}
                 name="confirmPassword"
@@ -118,9 +142,13 @@ const Register: React.FC = () => {
                       edge="end"
                     >
                       {showPassword ? (
-                        <VisibilityOff color="primary" />
+                        <VisibilityOff sx={{
+                          color: "black"
+                        }}  />
                       ) : (
-                        <Visibility color="primary" />
+                        <Visibility sx={{
+                          color: "black"
+                        }}  />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -136,9 +164,9 @@ const Register: React.FC = () => {
                 fullWidth
                 type="submit"
                 sx={{
-                  color: "white",
+                  color: "#fff",
+                  backgroundColor: "black", // Fondo negro
                   textTransform: "none",
-                  textShadow: "2px 2px 2px grey",
                 }}
               >
                 Registrarme
@@ -150,6 +178,11 @@ const Register: React.FC = () => {
                 fullWidth
                 onClick={() => navigate("/login")}
                 type="button"
+                sx={{
+                  color: "#fff",
+                  backgroundColor: "black", // Fondo negro
+                  textTransform: "none",
+                }}
               >
                 Regresar
               </Button>

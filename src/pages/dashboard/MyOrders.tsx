@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import OrderDetails from './OrderDetails';
 
 import {
   Button,
@@ -104,7 +104,7 @@ const MyOrders: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </Box>
-
+       <OrderDetails/>
       </Drawer>
 
     </Box>

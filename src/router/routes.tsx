@@ -1,10 +1,11 @@
 import React from "react";
-import Cart from "../pages/cart/Cart";
 import Home from "../pages/home/Home";
 import ItemDetail from "../components/pageComponents/itemDetail/ItemDetail";
-import ItemListContainer from "../containers/itemlist/ItemListContainer";
+import Shop from "../pages/shop/Shop";
 import UserOrders from "../components/pageComponents/userOrders/UserOrders";
 import Search from "../pages/search/Search";
+
+
 interface Route {
   id: string;
   path: string;
@@ -20,17 +21,12 @@ export const routes: Route[] = [
   {
     id: "shop",
     path: "/shop",
-    Element: ItemListContainer,
+    Element: Shop,
   },
   {
     id: "detalle",
     path: "/itemDetail/:id",
     Element: ItemDetail,
-  },
-  {
-    id: "cart",
-    path: "/cart",
-    Element: Cart,
   },
   {
     id: "userOrders",

@@ -143,11 +143,25 @@ const updateCustomerInformation = (info: Partial<CustomerInfo>) => {
   }
 };
 
+
+  // Cargar la información del cliente en el almacenamiento local al inicio
+  useEffect(() => {
+    const savedCustomerInfo = JSON.parse(localStorage.getItem("customerInfo") || "null") as CustomerInfo;
+    setCustomerInfo(savedCustomerInfo);
+    
+  }, []);
+
+   // Actualizar el almacenamiento local cuando cambia la información del cliente
+
+   useEffect(() => {
+    localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
+  }, [customerInfo]);
+
+
   // Cargar el carrito y las cantidades desde el almacenamiento local al inicio
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart") || "[]") as CartItem[];
     const savedQuantities = JSON.parse(localStorage.getItem("productQuantities") || "{}");
-
     setCart(savedCart);
     setProductQuantities(savedQuantities);
   }, []);

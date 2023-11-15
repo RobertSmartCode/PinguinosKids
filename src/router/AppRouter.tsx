@@ -10,7 +10,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import UserOrders from "../pages/UserAccount/UserAccount";
 import ProtectedAdmin from "./ProtectedAdmin";
 import ProtectedUsers from "./ProtectedUsers";
-
+import PaymentSuccess  from "../pages/checkout/PaymentSuccess";
 
 const AppRouter = () => {
   return (
@@ -52,6 +52,9 @@ const AppRouter = () => {
 
        {/* CheckoutNext */}
        <Route path="/checkout/next" element={<CheckoutNext />} /> 
+
+        {/* CheckoutLogin */}
+        <Route path="/checkout/paymentsuccess" element={<PaymentSuccess />} /> 
 
       <Route path="*" element={<h1>Not found</h1>} />
     </Routes>

@@ -8,17 +8,30 @@ import {
   DocumentData,
 } from "firebase/firestore";
 import { AuthContext } from "../../context/AuthContext";
+import firebase from 'firebase/app'; 
+import 'firebase/firestore';
 
 interface Order {
   id: string;
+  date: firebase.firestore.Timestamp;
   items: Array<{
     id: string;
     title: string;
     quantity: number;
   }>;
+  shippingCost: number;
   total: number;
-  // Agrega aquí cualquier otro campo que puedas tener en tus órdenes
+  userData: {
+    phone: string;
+    identificationDocument: string;
+    otherPersonLastName: string;
+    isOtherPerson: boolean;
+    firstName: string;
+    lastName: string;
+    // Agrega otros campos según la estructura de userData
+  };
 }
+
 
 const UserOrders = () => {
   const [myOrders, setMyOrders] = useState<Order[]>([]);
@@ -48,18 +61,30 @@ const UserOrders = () => {
     <div>
       <h1>Estoy en mis órdenes</h1>
       {myOrders.map((order) => (
-        <div key={order.id} style={{ border: "2px solid black" }}>
-          {order?.items?.map((product) => (
-            <div key={product.id}>
-              <h2>{product.title}</h2>
-              <h3>{product.quantity}</h3>
-            </div>
-          ))}
-          <h4>El total de la orden es {order.total}</h4>
+        <div key={order.id} style={{ border: "2px solid black", color:"black" }}>
+          <p>Fecha de la orden: {order.date.toDate().toLocaleString()}</p>
+          <p>Costo de envío: ${order.shippingCost}</p>
+          <h4>Detalles de la orden:</h4>
+          <ul>
+            {order?.items?.map((product, index) => (
+              <li key={index}>
+                <h2>{product.title}</h2>
+                <h3>Cantidad: {product.quantity}</h3>
+              </li>
+            ))}
+          </ul>
+          <h4>Total de la orden: ${order.total}</h4>
+          <h4>Información del usuario:</h4>
+          <p>Nombre: {order.userData.firstName} {order.userData.lastName}</p>
+          <p>Teléfono: {order.userData.phone}</p>
+          <p>Documento de identificación: {order.userData.identificationDocument}</p>
+          {/* Agrega más campos según la estructura de tu objeto userData */}
         </div>
       ))}
     </div>
   );
+  
+  
 };
 
 export default UserOrders;

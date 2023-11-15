@@ -5,8 +5,7 @@ import MyOrders from "./MyOrders";
 import PaymentMethodsList from "./PaymentMethodsList";
 import ShippingMethodsList from "./ShippingMethodsList";
 import StoreDataList from "./StoreDataList";
- import PromoCode from "./PromoCode";
-
+import PromoCode from "./PromoCode";
 
 
 const containerStyles = {
@@ -20,33 +19,18 @@ const containerStyles = {
 
 };
 
-
-
-
 const Dashboard: React.FC = () => {
-
-
 
   return (
     <Box 
-    sx={containerStyles}>
-
+        sx={containerStyles}>
         <MyOrders />
-        
-      <ProductAddForm />
-
-      <ProductsList />
-      
-      
-     
-      <PaymentMethodsList/>
-
-      <ShippingMethodsList/>
-
-      <StoreDataList/>
-    
+        <ProductAddForm />
+        <ProductsList />
+        <PaymentMethodsList/>
+        <ShippingMethodsList/>
+        <StoreDataList/>
         <PromoCode/>
-
     </Box>
   );
 };

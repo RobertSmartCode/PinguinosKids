@@ -11,8 +11,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useMediaQuery,
-  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,12 +19,20 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { AuthContext } from "../../context/AuthContext";
 import { db, loginGoogle, onSigIn } from "../../firebase/firebaseConfig";
 import { collection, doc, getDoc } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 
 const Login: React.FC = () => {
+
+
+const { search } = useLocation();
+const params = new URLSearchParams(search);
+const isComingFromPaymentSuccess = params.get('from');
+
+
+
   const { handleLogin } = useContext(AuthContext)!;
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -53,12 +60,18 @@ const Login: React.FC = () => {
           rol: userDoc.data()?.rol,
         };
         handleLogin(finalUser);
-        navigate("/");
+  
+        if (isComingFromPaymentSuccess) {
+          navigate("/user-orders"); // Redirige a la página de pedidos del usuario
+        } else {
+          navigate("/"); // Redirige a la página principal
+        }
       }
     } catch (error) {
       console.log(error);
     }
   };
+  
 
   const googleSignIn = async () => {
     const res = await loginGoogle();
@@ -79,6 +92,7 @@ const Login: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
+        height: '100vh', 
         padding: "20px",
         maxWidth: "600px",
         marginLeft: "auto",
@@ -87,30 +101,41 @@ const Login: React.FC = () => {
           paddingLeft: "400px",
           paddingRight: "400px",
         }),
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: "white",
       }}
     >
+
+{isComingFromPaymentSuccess && (
+        <Typography variant="h5" sx={{ fontWeight: "bold", marginBottom: 2, color: "black",}}>
+          Inicia sesión para hacerle seguimiento a tu compra
+        </Typography>
+      )}
+
       <form onSubmit={handleSubmit}>
         <Grid container rowSpacing={2} justifyContent={"center"}>
           <Grid item xs={12} md={12}>
-            <TextField
+          <TextField
               name="email"
               label="Email"
               fullWidth
               onChange={handleChange}
-              InputProps={{
-                sx: {
-                  color: "#000", // Color de texto negro
-                },
+              sx={{
+                color: "black",
+                backgroundColor: "white"
               }}
             />
+
           </Grid>
           <Grid item xs={12} md={12}>
             <FormControl variant="outlined" fullWidth>
-              <InputLabel htmlFor="outlined-adornment-password">
+              <InputLabel htmlFor="outlined-adornment-password" >
                 Contraseña
               </InputLabel>
               <OutlinedInput
+              sx={{
+                color: "black",
+                backgroundColor: "white"
+              }}
                 name="password"
                 onChange={handleChange}
                 id="outlined-adornment-password"
@@ -123,17 +148,19 @@ const Login: React.FC = () => {
                       edge="end"
                     >
                       {showPassword ? (
-                        <VisibilityOff color="primary" />
+                        <VisibilityOff sx={{
+                          color: "black"
+                        }} />
                       ) : (
-                        <Visibility color="primary" />
+                        <Visibility sx={{
+                          color: "black"
+                        }} />
                       )}
                     </IconButton>
                   </InputAdornment>
                 }
                 label="Contraseña"
-                sx={{
-                  color: "#000", // Color de texto negro
-                }}
+                
               />
             </FormControl>
           </Grid>

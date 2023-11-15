@@ -1,15 +1,18 @@
 import { useState, useContext, useEffect } from "react";
-import { Wallet, initMercadoPago } from "@mercadopago/sdk-react";
+import { initMercadoPago, Wallet} from "@mercadopago/sdk-react";
 import axios from "axios";
 import { CartContext } from '../../context/CartContext';
 
 
+
 const MercadoPagoPayment = () => {
-  const { cart, getSelectedShippingMethod, getTotalPrice, discountInfo } = useContext(CartContext)! || {};
+  const { cart, getSelectedShippingMethod, getTotalPrice, discountInfo, getCustomerInformation } = useContext(CartContext)! || {};
   const [preferenceId, setPreferenceId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const subtotal = getTotalPrice ? getTotalPrice() : 0;
   const selectedShippingMethod = getSelectedShippingMethod();
+
+
   const shippingCost = selectedShippingMethod ? selectedShippingMethod.price : 0;
   const discountPercentage = discountInfo?.discountPercentage ?? 0;
   const maxDiscountAmount = discountInfo?.maxDiscountAmount ?? 0;
@@ -23,9 +26,11 @@ const MercadoPagoPayment = () => {
     total = subtotal + shippingCost - maxDiscountAmount;
   }
 
-  console.log(total)
-  
- 
+
+const userData = getCustomerInformation()
+
+
+
   useEffect(() => {
     // Inicializa Mercado Pago con tu clave pública y la configuración de localización
     initMercadoPago(import.meta.env.VITE_PUBLICKEY, {
@@ -34,6 +39,17 @@ const MercadoPagoPayment = () => {
 
     // Luego de la inicialización, llama a createPreference automáticamente
     createPreference();
+
+
+    let order = {
+      userData,
+      items: cart,
+      shippingCost,
+      total
+      
+    };
+    localStorage.setItem("order", JSON.stringify(order));
+   
   }, []);
 
 
