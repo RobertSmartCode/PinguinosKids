@@ -4,46 +4,19 @@ import { Button, IconButton, Box, Typography, Drawer} from "@mui/material";
 import {
     collection,
     getDocs,
-
   } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import CloseIcon from "@mui/icons-material/Close";
+import { useColorsContext } from '../../context/ColorsContext'; 
 
-
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: string[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string; 
-}
-
+import { Product} from '../../type/type';
 
 
 const ProductAddForm = () => {
-  
-   
+    const { updateColors } = useColorsContext()!;
     const [productSelected, setProductSelected] = useState<Product | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [isChange, setIsChange] = useState<boolean>(false);
-
 
     useEffect(() => {
         setIsChange(false);
@@ -167,12 +140,13 @@ return (
         </Box>
         {/* Aplica scroll solo al contenido del formulario */}
         <Box sx={{ overflowY: 'scroll', height: '100%' }}>
-          <ProductsForm
+        <ProductsForm
             handleClose={handleClose}
             setIsChange={setIsChange}
             productSelected={productSelected}
             setProductSelected={setProductSelected}
             products={products}
+            updateColors={updateColors} 
           />
         </Box>
       </Drawer>

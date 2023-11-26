@@ -24,9 +24,15 @@ interface Product {
   details: string;
 }
 
-interface CartItem extends Product {
+interface CartItem extends Omit<Product, "colors"> {
   quantity: number;
+  colors: {
+    color: string;
+    sizes: string[];
+    quantities: number[];
+  }[];
 }
+
 
 interface CartContextData {
   cart: CartItem[];

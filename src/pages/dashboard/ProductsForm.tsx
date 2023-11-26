@@ -15,72 +15,13 @@ import {
   MenuItem
 
 } from "@mui/material";
-
-
 import * as Yup from "yup";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: string[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string; 
-}
-
-
-interface ProductsFormProps {
-  handleClose: () => void;
-  setIsChange: (value: boolean) => void;
-  productSelected: Product | null;
-  setProductSelected: (product: Product | null) => void;
-  products: Product[];
-}
-
-const getFormattedDate = (): string => {
-  const currentDate = new Date();
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  } as const;
-  return currentDate.toLocaleDateString("es-ES", options);
-};
-
-const productSchema = Yup.object().shape({
-  title: Yup.string().required("El nombre es obligatorio"),
-  description: Yup.string().required("La descripción es obligatoria"),
-  unit_price: Yup.number()
-    .required("El precio es obligatorio")
-    .positive("El precio debe ser positivo")
-    .moreThan(0, "El precio debe ser mayor que 0"),
-  stock: Yup.number()
-    .required("El stock es obligatorio")
-    .integer("El stock debe ser un número entero")
-    .min(0, "El stock debe ser mayor o igual a 0"),
-  category: Yup.string().required("La categoría es obligatoria"),
-  sku: Yup.string().required("El SKU es obligatorio"),
-  // Puedes agregar más validaciones según tus necesidades
-});
-
-
-
-
+import ColorInput from './ColorInput';
+import { useColorsContext } from '../../context/ColorsContext'; 
+import { Product, ColorData, ProductsFormProps } from '../../type/type';
+import { getFormattedDate } from '../../utils/dateUtils';
+import { ErrorMessage } from '../../messages/ErrorMessage';
+import { productSchema } from '../../schema/productSchema';
 
 
 const ProductsForm: React.FC<ProductsFormProps> = ({
@@ -98,23 +39,84 @@ const ProductsForm: React.FC<ProductsFormProps> = ({
     category: "",
     unit_price: 1000,
     discount: 10,
-    stock: 10,
+    stock: 0,
     sizes: [],
     colors: [],
     images: [],
     sku: "",
     keywords: [],
-    salesCount: 12,
+    salesCount: 0,
     featured: false,
     createdAt: getFormattedDate(),
-    elasticity: "", 
-    thickness: "", 
-    breathability: "", 
+    elasticity: "",
+    thickness: "",
+    breathability: "",
     season: "",
-    material: "", 
-    details: "", 
+    material: "",
+    details: "",
   });
-  
+
+const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+const [colorErrors, setColorErrors] = useState<{ [key: string]: string }>({});
+
+const [errorTimeout, setErrorTimeout] = useState<NodeJS.Timeout | null>(null);
+
+const clearErrors = () => {
+  setErrors({});
+  setColorErrors({}); 
+};
+
+// Función para manejar el tiempo de duración de los errores
+const setErrorTimeoutAndClear = () => {
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+  }
+
+  const timeout = setTimeout(clearErrors, 10000); // 5000 milisegundos (5 segundos)
+  setErrorTimeout(timeout);
+};
+
+
+const validateColorsData = (colorsData: ColorData[]) => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!colorsData || colorsData.length === 0) {
+    newErrors.colors = "Debe haber al menos un color";
+  }
+
+  for (let i = 0; i < colorsData.length; i++) {
+    const color = colorsData[i];
+
+    if (!color.color || color.sizes.length === 0 || color.quantities.length === 0) {
+      newErrors[`color${i}`] = "Cada color debe tener al menos una talla y una cantidad";
+      console.log(newErrors)
+    }
+  }
+
+  setColorErrors(newErrors);
+
+  return Object.keys(newErrors).length === 0; // Devuelve true si no hay errores
+};
+
+
+const { colors, updateColors } = useColorsContext()!;
+
+const calculateStock = (colorsData: ColorData[]) => {
+  let totalStock = 0;
+
+  colorsData.forEach((colorData) => {
+    colorData.quantities.forEach((quantity) => {
+      totalStock += quantity;
+    });
+  });
+
+  return totalStock;
+};
+
+
+const [selectedProductColors, setSelectedProductColors] = useState<{ color: string; sizes: string[]; quantities: number[] }[]>([]);
+
 
 
  // Estado para las imágenes existentes
@@ -132,53 +134,78 @@ const ProductsForm: React.FC<ProductsFormProps> = ({
   );
 
 
-
   useEffect(() => {
-    const loadImages = () => {
-      if (productSelected) {
-        setFiles(productSelected.images.map((imageUrl) => new File([], imageUrl)));
-      } else {
-        setFiles(newProduct.images.map((imageUrl) => new File([], imageUrl)));
-      }
-    };
-  
-    loadImages();
-  }, [productSelected, newProduct]);
-  
-  
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      if (
-        selectedFiles.length + selectedImageCount <= 8 &&
-        selectedFiles.length + selectedImageCount >= 1
-      ) {
-        const updatedFiles = [...files, ...selectedFiles];
-        setFiles(updatedFiles);
-        setSelectedImageCount(selectedImageCount + selectedFiles.length);
-        setUploadMessage("");
-        if (productSelected) {
-          const updatedProductSelected = {
-            ...productSelected,
-            images: [
-              ...productSelected.images,
-              ...selectedFiles.map((file) => URL.createObjectURL(file)),
-            ],
-          };
-          setProductSelected(updatedProductSelected);
-        }
-  
-        
-      } else {
-        setUploadMessage(
-          "Llegaste al límite de fotos permitido (mínimo 1, máximo 8)."
-        );
-      }
+    if (productSelected) {
+      setSelectedProductColors(productSelected.colors || []);
+      setFiles(productSelected.images.map((imageUrl) => new File([], imageUrl)));
+    } else {
+      setFiles(newProduct.images.map((imageUrl) => new File([], imageUrl)));
     }
-  };
+  }, [productSelected, newProduct]);
+
   
 
+  
+  
+
+const normalizeImages = async (imageFiles: File[], existingImageURLs: string[]) => {
+  // Filtra las imágenes que ya son URLs de Firebase
+  const firebaseImages = existingImageURLs.filter((url) =>
+  url.startsWith('https://firebasestorage.googleapis.com'));
+
+  // Filtra las imágenes que son blob URLs (temporales)
+  const localImages = imageFiles.filter((file) =>
+   URL.createObjectURL(file).startsWith('blob:'));
+
+  // Sube las imágenes locales a Firebase y obtén sus URLs
+  const uploadedLocalImages = await Promise.all(localImages.map(async (file) => {
+    // Asume que uploadFile es una función que sube el archivo a Firebase
+    const url = await uploadFile(file); 
+    return url;
+  }));
+
+  // Combina todas las URLs
+  const normalizedImages = [...firebaseImages, ...uploadedLocalImages];
+
+  return normalizedImages;
+};
+
+// Uso en tu función handleImageChange
+const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files) {
+    const selectedFiles = Array.from(e.target.files);
+    if (
+      selectedFiles.length + selectedImageCount <= 8 &&
+      selectedFiles.length + selectedImageCount >= 1
+    ) {
+      const updatedFiles = [...files, ...selectedFiles];
+      setFiles(updatedFiles);
+      setSelectedImageCount(selectedImageCount + selectedFiles.length);
+      setUploadMessage("");
+      if (productSelected) {
+        normalizeImages(selectedFiles, productSelected.images)
+          .then((normalizedImages) => {
+            const updatedProductSelected = {
+              ...productSelected,
+              images: normalizedImages,
+            };
+            console.log(updatedProductSelected.images);
+            setProductSelected(updatedProductSelected);
+          })
+          .catch((error) => {
+            console.error("Error al normalizar las imágenes:", error);
+            setUploadMessage("Error al cargar las imágenes");
+          });
+      }
+    } else {
+      setUploadMessage(
+        "Llegaste al límite de fotos permitido (mínimo 1, máximo 8)."
+      );
+    }
+  }
+};
+
+  
 
 // Función para manejar la eliminación de imágenes existentes
 
@@ -265,15 +292,31 @@ const handleRemoveImage = (index: number) => {
   };
 
 
+
+
    // Función para manejar el envío del formulario
+
+
    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
     try {
       // Validar el producto, ya sea el nuevo o el editado
       const productToValidate = productSelected || newProduct;
+
       await productSchema.validate(productToValidate, { abortEarly: false });
   
+      
+    // Validar los datos de colores
+    if (!validateColorsData(colors)) {
+      setSnackbarMessage("Por favor, corrige los errores en el formulario.");
+      setSnackbarOpen(true);
+      setErrorTimeoutAndClear();
+      return;
+    }
+       
+       
+    
       // Subir las imágenes y obtener las URLs
       const uploadedImages = await uploadImages();
   
@@ -281,24 +324,23 @@ const handleRemoveImage = (index: number) => {
       const productInfo = {
         ...productToValidate,
         unit_price: +productToValidate.unit_price,
-        stock: +productToValidate.stock,
         createdAt: productToValidate.createdAt ?? getFormattedDate(),
+        colors: colors.length > 0 ? [...colors] : [], 
+        stock: calculateStock(colors), 
+        images: [...uploadedImages],
       };
+      
   
       const productsCollection = collection(db, "products");
-
-
-
+  
       if (productSelected) {
         // Actualizar el producto existente sin duplicar las imágenes
         productInfo.images = productSelected.images; // Utiliza las imágenes existentes
         await updateProduct(productsCollection, productSelected.id, productInfo);
       } else {
         // Crear un nuevo producto con las imágenes cargadas
-        productInfo.images = [...uploadedImages];
         await createProduct(productsCollection, productInfo);
       }
-
   
       // Limpiar el estado y mostrar un mensaje de éxito
       setFiles([]);
@@ -316,6 +358,9 @@ const handleRemoveImage = (index: number) => {
           }
         });
         console.error("Errores de validación:", validationErrors);
+        setErrors(validationErrors);
+        setErrorTimeoutAndClear();
+        
         setSnackbarMessage("Por favor, corrige los errores en el formulario.");
         setSnackbarOpen(true);
       } else {
@@ -328,378 +373,410 @@ const handleRemoveImage = (index: number) => {
   };
   
   
-
   return (
-  
-        <Container 
-
-        maxWidth="xs"
-        sx={{
-          height: "100vh",
-          overflowY: "auto",
-          marginLeft: "auto",
-          marginRight: "auto", 
-          padding: "20px", 
-          border: "1px solid #ccc", 
-        }}
-       
+    <Container 
+      maxWidth="xs"
+      sx={{
+        height: "100vh",
+        overflowY: "auto",
+        marginLeft: "auto",
+        marginRight: "auto", 
+        padding: "20px", 
+        border: "1px solid #ccc", 
+      }}
+    >
+      <Paper elevation={3} style={{ padding: "20px" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "40px", 
+            marginRight: "40px",
+            gap: "20px",
+          }}
         >
-          <Paper elevation={3} style={{ padding: "20px" }}>
-            <form
-              onSubmit={handleSubmit}
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                marginLeft: "40px", 
-                marginRight: "40px",
-                gap: "20px",
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.title : newProduct.title}
-                    label="Nombre"
-                    name="title"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.description : newProduct.description}
-                    label="Descripción"
-                    name="description"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.category : newProduct.category}
-                    label="Categoría"
-                    name="category"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.unit_price: newProduct.unit_price}
-                    label="Precio"
-                    name="unit_price"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.discount : newProduct.discount}
-                    label="Descuento"
-                    name="discount"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.stock : newProduct.stock}
-                    label="Stock"
-                    name="stock"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.title : newProduct.title}
+                label="Nombre"
+                name="title"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+              <ErrorMessage
+                messages={
+                  errors.title
+                    ? Array.isArray(errors.title)
+                      ? errors.title
+                      : [errors.title]
+                    : []
+                }
+              />
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.sizes : newProduct.sizes}
-                    label="Talles (Separados por comas)"
-                    name="sizes"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.colors : newProduct.colors}
-                    label="Colores (Separados por comas)"
-                    name="colors"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.sku : newProduct.sku}
-                    label="SKU"
-                    name="sku"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.keywords: newProduct.keywords}
-                    label="Palabras clave (Separadas por comas)"
-                    name="keywords"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    value={productSelected ? productSelected.salesCount: newProduct.salesCount}
-                    label="Cantidad de ventas"
-                    name="salesCount"
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                  />
-                </Grid>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.description : newProduct.description}
+                label="Descripción"
+                name="description"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+              <ErrorMessage
+                messages={
+                  errors.description
+                    ? Array.isArray(errors.description)
+                      ? errors.description
+                      : [errors.description]
+                    : []
+                }
+              />
 
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    label="Producto Destacado"
-                    name="featured"
-                    select
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.featured ? "yes" : "no" : newProduct.featured ? "yes" : "no"}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="yes">Si</MenuItem>
-                    <MenuItem value="no">No</MenuItem>
-                  </TextField>
-                </Grid>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.category : newProduct.category}
+                label="Categoría"
+                name="category"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+               <ErrorMessage
+                messages={
+                  errors.category
+                    ? Array.isArray(errors.category)
+                      ? errors.category
+                      : [errors.category]
+                    : []
+                }
+              />
 
-                
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.unit_price: newProduct.unit_price}
+                label="Precio"
+                name="unit_price"
+                type="number"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+              <ErrorMessage
+                messages={
+                  errors.unit_price
+                    ? Array.isArray(errors.unit_price)
+                      ? errors.unit_price
+                      : [errors.unit_price]
+                    : []
+                }
+              />
 
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.discount : newProduct.discount}
+                label="Descuento"
+                type="number"
+                name="discount"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+               <ErrorMessage
+                  messages={
+                    errors.discount
+                      ? Array.isArray(errors.discount)
+                        ? errors.discount
+                        : [errors.discount]
+                      : []
+                  }
+                />
+            </Grid>
+  
+            {/* Input Color y Talles */}
+            <Grid item xs={12}>
+            <ColorInput
+              initialColors={selectedProductColors}
+              updateColors={updateColors}
+            />
+            <ErrorMessage errors={colorErrors} />
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    label="Elasticidad"
-                    name="elasticity"
-                    select
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.elasticity : newProduct.elasticity}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="alta">Alta</MenuItem>
-                    <MenuItem value="moderado">Moderado</MenuItem>
-                    <MenuItem value="nula">Nula/Casi Nula</MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    label="Espesor"
-                    name="thickness"
-                    select
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.thickness : newProduct.thickness}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="grueso">Grueso</MenuItem>
-                    <MenuItem value="moderado">Moderado</MenuItem>
-                    <MenuItem value="fino">Fino</MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    label="Transpirabilidad"
-                    name="breathability"
-                    select
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.breathability : newProduct.breathability}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="alta">Alta</MenuItem>
-                    <MenuItem value="moderado">Moderado</MenuItem>
-                    <MenuItem value="nula">Nula/Casi Nula</MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    variant="outlined"
-                    label="Temporada"
-                    name="season"
-                    select
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.season : newProduct.season}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="primavera/otono">Primavera/Otoño</MenuItem>
-                    <MenuItem value="verano">Verano</MenuItem>
-                    <MenuItem value="invierno">Invierno</MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    label="Materiales"
-                    name="material"
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    value={productSelected ? productSelected.material : newProduct.material}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    label="Detalles"
-                    name="details"
-                    multiline
-                    fullWidth
-                    sx={{ width: '75%', margin: 'auto' }}
-                    rows={4}
-                    value={productSelected ? productSelected.details : newProduct.details}
-                    onChange={handleChange}
-                  />
-                 </Grid>
-
-
-
-
-
-                <Grid item xs={12}>
-                  <div style={{ maxHeight: "600px", overflowY: "scroll" }}>
-                    {productSelected ? (
-                      productSelected.images.map((imageUrl, index) => (
-                        <Card key={index} style={{ maxWidth: 345 }}>
-                          <CardMedia
-                            component="img"
-                            height="140"
-                            image={imageUrl}
-                            alt={`Imagen ${index + 1}`}
-                            style={{ objectFit: "contain" }}
-                          />
-                          <CardContent>
-                            <p>{`Vista Previa ${index + 1}`}</p>
-                          </CardContent>
-                          <CardActions>
-                            <Button
-                              size="small"
-                              variant="contained"
-                              color="secondary"
-                              onClick={() => handleRemoveImage(index)}
-                            >
-                              Eliminar
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      ))
-                    ) : (
-                      files.map((file, index) => (
-                        <Card key={index} style={{ maxWidth: 345 }}>
-                          <CardMedia
-                            component="img"
-                            height="140"
-                            image={URL.createObjectURL(file)}
-                            alt={`Vista Previa ${index + 1}`}
-                            style={{ objectFit: "contain" }}
-                          />
-                          <CardContent>
-                            <p>{`Vista Previa ${index + 1}`}</p>
-                          </CardContent>
-                          <CardActions>
-                            <Button
-                              size="small"
-                              variant="contained"
-                              color="secondary"
-                              onClick={() => handleRemoveImage(index)}
-                            >
-                              Eliminar
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                </Grid>
-
-
-
-
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={openFileInput}
-                  >
-                    Subir foto
-                  </Button>
-                  {selectedImageCount >= 1 && selectedImageCount < 8 && (
-                    <p>Puedes subir otra foto.</p>
-                  )}
-                  {selectedImageCount === 8 && (
-                    <p>Llegaste al máximo de fotos permitido.</p>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                  />
-                  <p>{uploadMessage}</p>
-                </Grid>                    
-
-                <Grid item xs={12}>
-                  {!isLoading && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      {productSelected ? "Modificar" : "Crear"}
-                    </Button>
-                  )}
-                </Grid>
-              </Grid>
-            </form>
-          </Paper>
-          <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={4000}
-            onClose={() => setSnackbarOpen(false)}
-            message={snackbarMessage}
-          />
-        </Container>
-
+          </Grid>
+            {/* Input Color y Talles */}
+  
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.sku : newProduct.sku}
+                label="SKU"
+                name="sku"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+                <ErrorMessage
+                  messages={
+                    errors.sku
+                      ? Array.isArray(errors.sku)
+                        ? errors.sku
+                        : [errors.sku]
+                      : []
+                  }
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.keywords: newProduct.keywords}
+                label="Palabras clave (Separadas por comas)"
+                name="keywords"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                value={productSelected ? productSelected.salesCount: newProduct.salesCount}
+                label="Cantidad de ventas"
+                type="number"
+                name="salesCount"
+                onChange={handleChange}
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+              />
+            </Grid>
+  
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                label="Producto Destacado"
+                name="featured"
+                select
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.featured ? "yes" : "no" : newProduct.featured ? "yes" : "no"}
+                onChange={handleChange}
+              >
+                <MenuItem value="yes">Si</MenuItem>
+                <MenuItem value="no">No</MenuItem>
+              </TextField>
+            </Grid>
+  
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                label="Elasticidad"
+                name="elasticity"
+                select
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.elasticity : newProduct.elasticity}
+                onChange={handleChange}
+              >
+                <MenuItem value="alta">Alta</MenuItem>
+                <MenuItem value="moderado">Moderado</MenuItem>
+                <MenuItem value="nula">Nula/Casi Nula</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                label="Espesor"
+                name="thickness"
+                select
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.thickness : newProduct.thickness}
+                onChange={handleChange}
+              >
+                <MenuItem value="grueso">Grueso</MenuItem>
+                <MenuItem value="moderado">Moderado</MenuItem>
+                <MenuItem value="fino">Fino</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                label="Transpirabilidad"
+                name="breathability"
+                select
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.breathability : newProduct.breathability}
+                onChange={handleChange}
+              >
+                <MenuItem value="alta">Alta</MenuItem>
+                <MenuItem value="moderado">Moderado</MenuItem>
+                <MenuItem value="nula">Nula/Casi Nula</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                label="Temporada"
+                name="season"
+                select
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.season : newProduct.season}
+                onChange={handleChange}
+              >
+                <MenuItem value="primavera/otono">Primavera/Otoño</MenuItem>
+                <MenuItem value="verano">Verano</MenuItem>
+                <MenuItem value="invierno">Invierno</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                label="Materiales"
+                name="material"
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                value={productSelected ? productSelected.material : newProduct.material}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                label="Detalles"
+                name="details"
+                multiline
+                fullWidth
+                sx={{ width: '75%', margin: 'auto' }}
+                rows={4}
+                value={productSelected ? productSelected.details : newProduct.details}
+                onChange={handleChange}
+              />
+            </Grid>
+  
+            {/* Maneja la carga de las imagenes para Modificar */}
+            <Grid item xs={12}>
+              <div style={{ maxHeight: "600px", overflowY: "scroll" }}>
+                {productSelected ? (
+                  productSelected.images.map((imageUrl, index) => (
+                    <Card key={index} style={{ maxWidth: 345 }}>
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={imageUrl}
+                        alt={`Imagen ${index + 1}`}
+                        style={{ objectFit: "contain" }}
+                      />
+                      <CardContent>
+                        <p>{`Vista Previa ${index + 1}`}</p>
+                      </CardContent>
+                      <CardActions>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          Eliminar
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  ))
+                ) : (
+                  files.map((file, index) => (
+                    <Card key={index} style={{ maxWidth: 345 }}>
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={URL.createObjectURL(file)}
+                        alt={`Vista Previa ${index + 1}`}
+                        style={{ objectFit: "contain" }}
+                      />
+                      <CardContent>
+                        <p>{`Vista Previa ${index + 1}`}</p>
+                      </CardContent>
+                      <CardActions>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          Eliminar
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </Grid>
+  
+            {/* Maneja la carga de las imagenes para Crear */}
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={openFileInput}
+              >
+                Subir foto
+              </Button>
+              {selectedImageCount >= 1 && selectedImageCount < 8 && (
+                <p>Puedes subir otra foto.</p>
+              )}
+              {selectedImageCount === 8 && (
+                <p>Llegaste al máximo de fotos permitido.</p>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+              />
+              <p>{uploadMessage}</p>
+            </Grid>
+  
+            {/* Botón de crear o modificar*/}
+            <Grid item xs={12}>
+              {!isLoading && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {productSelected ? "Modificar" : "Crear"}
+                </Button>
+              )}
+             
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+      />
+    </Container>
   );
+  
+
+
+
 };
 
 export default ProductsForm;

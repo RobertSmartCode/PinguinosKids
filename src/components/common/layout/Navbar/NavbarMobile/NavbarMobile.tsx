@@ -7,12 +7,11 @@ import {
   Box,
 } from "@mui/material";
 
-
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import MobileMenuList from "./MobileMenuList/MobileMenuList";
 import MobileLogo from "./MobileLogo/MobileLogo";
@@ -32,8 +31,8 @@ const customColors = {
 };
 
 
-const NavbarMobile = (props:any) => {
 
+const NavbarMobile = (props:any) => {
   
   const { window } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -72,9 +71,6 @@ const NavbarMobile = (props:any) => {
 
   const container = window !== undefined ? () => window().document.body : undefined;
 
-  const logoUrl = "https://firebasestorage.googleapis.com/v0/b/pinguinos-kids.appspot.com/o/LogoMobile%2FLogoMobile.png?alt=media&token=eca73682-14ea-4dbd-803d-31be6a85d6ad";
-
-
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -100,36 +96,46 @@ const NavbarMobile = (props:any) => {
     {/* Elementos a la izquierda (menú de hamburguesa y Logo de la empresa) */}
 
 
-                         {/* Menú de hamburguesa */}
-    <IconButton
-      color="secondary"
-      aria-label="toggle menu"
-      edge="start"
-      onClick={handleMenuToggle}
-    >
-  {isMenuOpen ? <CloseIcon sx={{ color: customColors.primary.main }} /> : <MenuIcon sx={{ color: customColors.primary.main }} />}
-</IconButton>
+                                {/* Logo de la Empresa */}
 
-                            {/* Logo de la Empresa */}
+      <MobileLogo  />
+      
+                                {/* Campo de búsqueda */}
+      <IconButton
+          sx={{ color: customColors.primary.main }}
+          aria-label="search"
+          onClick={toggleSearch}
+          >
+          <SearchIcon />
+        </IconButton>
+      </div>
 
-    <Link to="/" style={{ color: "whitesmoke", textDecoration: "none" }}>
-    <MobileLogo src={logoUrl} alt="Logo" />
-    </Link>
-  </div>
-  <div style={{ display: "flex", alignItems: "center" }}>
 
-                           {/* Campo de búsqueda */}
-   <IconButton
-     sx={{ color: customColors.primary.main }}
-     aria-label="search"
-     onClick={toggleSearch}
-    >
-    <SearchIcon />
-    </IconButton>
+      <div style={{ display: "flex", alignItems: "center" }}>
+
+                          {/* Menú de hamburguesa */}
+
+      <IconButton
+            color="secondary"
+            aria-label="toggle menu"
+            edge="start"
+            onClick={handleMenuToggle}
+          >
+        {isMenuOpen ? <CloseIcon sx={{ color: customColors.primary.main }} /> : <MenuIcon sx={{ color: customColors.primary.main }} />}
+      </IconButton>
+
+                               
+
 
                            {/* Icono del carrito */}
 
     <MobileCart  onClick={handleCartClick} />
+
+         
+
+
+
+
           
   </div>
   

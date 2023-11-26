@@ -16,7 +16,11 @@ interface Product {
   discount: number;
   stock: number;
   sizes: string[];
-  colors: string[];
+  colors: {
+    color: string;
+    sizes: string[];
+    quantities: number[];
+  }[];
   sku: string;
   keywords: string[];
   salesCount: number;
@@ -28,12 +32,21 @@ interface Product {
   breathability: string;
   season: string; 
   material: string; 
-  details: string;
+  details: string; 
 }
 
+
 interface CartItem extends Product {
-  quantity: number; 
+  quantity: number;
+  // Asegúrate de que la propiedad 'colors' sea la misma que en la interfaz 'Product'
+  colors: {
+    color: string;
+    sizes: string[];
+    quantities: number[];
+  }[]; // Mismo tipo que en la interfaz 'Product'
 }
+
+
 
 const ItemListContainer: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -123,6 +136,9 @@ const ItemListContainer: React.FC = () => {
     marginRight: '32px',
     marginBottom: '0px',
   };
+
+
+  
 
   const handleBuyClick = (product: Product) => {
     // Crear un objeto CartItem basado en el producto con una cantidad inicial de 1

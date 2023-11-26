@@ -3,11 +3,10 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useSortContext } from "../../context/SortContext"; // Importa el hook de contexto de clasificación
 
-interface SortProps {
-  // No necesitas la función applySort en este componente, ya que ahora utiliza el contexto
-}
+import SortIcon from '@mui/icons-material/Sort';
 
-const Sort: React.FC<SortProps> = () => {
+
+const Sort: React.FC = () => {
   const { updateSort } = useSortContext()!; // Utiliza el hook de contexto de clasificación
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -25,22 +24,51 @@ const Sort: React.FC<SortProps> = () => {
     handleCloseMenu();
   };
 
+  const customColors = {
+    primary: {
+      main: '#000',
+      contrastText: '#000',
+    },
+    secondary: {
+      main: '#fff',
+      contrastText: '#fff',
+    },
+  };
+
+  
   return (
     <div style={{ textAlign: 'center' }}>
-      <button   onClick={handleOpenMenu}>Ordenar</button>
+      <button 
+        onClick={handleOpenMenu}
+        style={{ 
+          backgroundColor: customColors.secondary.main,
+          color: customColors.primary.main,
+          padding: '8px 16px',
+          border: `1px solid ${customColors.primary.main}`,
+          borderRadius: '4px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          marginLeft: '8px',
+        }}
+      >
+        Ordenar
+        <SortIcon style={{ marginLeft: '4px' }} />
+      </button>
+
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleCloseMenu}
       >
         <MenuItem onClick={() => handleSelectSortOption("lowToHigh")}>
-          Precio: Bajo a Alto
+          Menor Precio
         </MenuItem>
         <MenuItem onClick={() => handleSelectSortOption("highToLow")}>
-          Precio: Alto a Bajo
+          Mayor Precio
         </MenuItem>
-        <MenuItem onClick={() => handleSelectSortOption("aToZ")}>A-Z</MenuItem>
-        <MenuItem onClick={() => handleSelectSortOption("zToA")}>Z-A</MenuItem>
+      
         <MenuItem onClick={() => handleSelectSortOption("newToOld")}>
           Nuevos a Viejos
         </MenuItem>

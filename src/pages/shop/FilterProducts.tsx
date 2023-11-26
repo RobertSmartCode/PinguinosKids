@@ -1,20 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 
 
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from '@mui/material/IconButton';
+import TuneIcon from '@mui/icons-material/Tune';
 
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import Filter from "./Filter";
 
+import { Grid } from "@mui/material";
+
+import { useFilterContext } from "../../context/FilterContext";
+import { useSortContext } from "../../context/SortContext";
 
 
 const FilterProduct: React.FC = () => {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
+  const { filter } = useFilterContext()!;
+  const { sort } = useSortContext()!;
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      setIsDrawerOpen(false);
+    }
+  }, [filter, sort]);
 
 
   const toggleDrawer = (open: boolean) => () => {
@@ -59,10 +73,32 @@ const FilterProduct: React.FC = () => {
 
 
 
+
   return (
     <div style={{ textAlign: 'center' }}>
       {/* Agrega controles para otros filtros (color, categoría, precio, etc.) */}
-      <button  onClick={toggleDrawer(true)}>Filtrar</button>
+
+      <button 
+        onClick={toggleDrawer(true)}
+        style={{ 
+          backgroundColor: customColors.secondary.main,
+          color: customColors.primary.main,
+          padding: '8px 16px',
+          border: `1px solid ${customColors.primary.main}`,
+          borderRadius: '4px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          marginLeft: '8px',
+        }}
+      >
+        Filtrar
+        <TuneIcon style={{ marginLeft: '4px' }} />
+      </button>
+
+
+
+
       <Drawer
       anchor="right"
       open={isDrawerOpen}
@@ -88,7 +124,14 @@ const FilterProduct: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </Box>
-        
+        <Grid container spacing={2} style={{ marginTop: "10px" }}>
+          {/* Filtro Responsivo: En pantallas grandes (lg), ocupa la mitad del ancho, en pantallas pequeñas (xs) ocupa todo el ancho */}
+          <Grid item xs={12} lg={6}>
+            {/* Componente de opciones de clasificación */}
+            
+          </Grid>
+          {/* Agrega aquí otros componentes o elementos según tus necesidades */}
+        </Grid>
         <Filter/>
       </Drawer>
     </div>

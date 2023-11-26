@@ -3,14 +3,14 @@ import { Button, IconButton, Modal, TableBody, TableCell, TableContainer, TableH
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { db } from "../../firebase/firebaseConfig";
-
+import { useColorsContext } from '../../context/ColorsContext'; 
 import {
   collection,
-  getDocs,
   doc,
   deleteDoc,
+  onSnapshot
 } from "firebase/firestore";
-
+import { Product} from '../../type/type';
 
 import Box from "@mui/material/Box";
 import ProductsForm from "./ProductsForm";
@@ -18,33 +18,9 @@ import CloseIcon from "@mui/icons-material/Close";
 
 
 
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: string[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string; 
-}
-
-
 
 const ProductsList = () => {
+  const { updateColors } = useColorsContext()!;
   const [open, setOpen] = useState<boolean>(false);
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -52,12 +28,11 @@ const ProductsList = () => {
 
 
   useEffect(() => {
-    setIsChange(false);
     const productsCollection = collection(db, "products");
-    getDocs(productsCollection).then((res) => {
-      const newArr: Product[] = res.docs.map((productDoc) => {
+    const unsubscribe = onSnapshot(productsCollection, (snapshot) => {
+      const newArr: Product[] = snapshot.docs.map((productDoc) => {
         const productData = productDoc.data();
-  
+
         return {
           id: productDoc.id,
           title: productData.title || "", 
@@ -84,8 +59,9 @@ const ProductsList = () => {
       });
       setProducts(newArr);
     });
-  }, [isChange]);
 
+    return () => unsubscribe();
+  }, [isChange]);
   
   const deleteProduct = (id: string) => {
     deleteDoc(doc(db, "products", id));
@@ -265,7 +241,9 @@ const ProductsList = () => {
             productSelected={productSelected}
             setProductSelected={setProductSelected}
             products={products}
+            updateColors={updateColors} 
           />
+
         </Box>
       </Modal>
 

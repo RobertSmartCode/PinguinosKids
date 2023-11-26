@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { collection, query, where, getDocs, QueryConstraint, orderBy } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { Grid, Card, CardContent, Typography, Button, IconButton, Box } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { CartContext } from "../../context/CartContext";
-import FilterProduct from "./FilterProducts"; // Importa el componente FilterProduct
-import Sort from "./Sort"; // Importa el componente Sort
+import FilterProduct from "./FilterProducts"; 
 import { useFilterContext } from "../../context/FilterContext";
 import { useSortContext } from "../../context/SortContext";
+import { CartContext } from "../../context/CartContext";
+import AppliedFilters from "./AppliedFilters"; 
+
 
 interface Product {
   id: string;
@@ -19,7 +20,11 @@ interface Product {
   discount: number;
   stock: number;
   sizes: string[];
-  colors: string[];
+  colors: {
+    color: string;
+    sizes: string[];
+    quantities: number[];
+  }[];
   sku: string;
   keywords: string[];
   salesCount: number;
@@ -31,122 +36,129 @@ interface Product {
   breathability: string;
   season: string; 
   material: string; 
-  details: string;
+  details: string; 
 }
 
 interface CartItem extends Product {
-  quantity: number; 
+  quantity: number;
+  colors: {
+    color: string;
+    sizes: string[];
+    quantities: number[];
+  }[];
 }
 
 const Shop: React.FC = () => {
+ 
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const { addToCart } = useContext(CartContext)!; 
+  const { addToCart } = useContext(CartContext)!;
   const { filter } = useFilterContext()!;
   const { sort } = useSortContext()!;
 
-  // Ahora puedes acceder a los valores del filtro en tu componente Shop
-
+  
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      const productsCollection = collection(db, "products");
+      const productsQuery = query(productsCollection);
 
-    const fetchFilteredProducts = async () => {
-      // Referencia a la colección "products"
-      const productsCollection = collection(db, 'products');
-  
-      // Construir la consulta base sin condiciones
-      let filteredQuery = query(productsCollection);
-  
-      // Construir un array para almacenar las condiciones de filtro
-      const filterConditions: QueryConstraint[] = [];
-  
-      // Filtrar por colores
-      if (filter.colors) {
-        const selectedColors = Object.keys(filter.colors).filter(color => filter.colors[color]);
-        console.log(selectedColors);
-        if (selectedColors.length > 0) {
-          // Agregar condición de colores al array usando "in"
-          filterConditions.push(where("colors", "in", selectedColors));
-        }
-      }
-  
-      // Filtrar por tamaños
-      if (filter.sizes) {
-        const selectedSizes = Object.keys(filter.sizes).filter(size => filter.sizes[size]);
-        console.log(selectedSizes);
-        if (selectedSizes.length > 0) {
-          // Agregar condiciones de tamaños al array
-            filterConditions.push(where("sizes", "in", selectedSizes));
-        }
-      }
-  
       try {
-        // Aplicar todas las condiciones de filtro a la consulta
-        if (filterConditions.length > 0) {
-          filteredQuery = query(filteredQuery, ...filterConditions);
-        }
-  
-        // Ejecutar la consulta con todas las condiciones aplicadas y obtener el QuerySnapshot
-        const querySnapshot = await getDocs(filteredQuery);
-  
-        // Mapear los documentos a objetos Product
-        const productsData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        } as Product));
-  
-        // Almacenar los resultados en el estado
-        console.log(productsData);
+        const querySnapshot = await getDocs(productsQuery);
+        const productsData = querySnapshot.docs.map(
+          (doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          } as Product)
+        );
+
+        setAllProducts(productsData);
         setProducts(productsData);
       } catch (error) {
-        console.error('Error al obtener productos filtrados:', error);
+        console.error("Error al obtener productos:", error);
       }
     };
-  
-    // Llamar a la función para cargar los productos cuando el filtro cambie
-    fetchFilteredProducts();
-  }, [filter]);  // Asegúrate de incluir 'filter' como dependencia
-  
-  
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
-    const fetchSortedProducts = async () => {
-      const productsCollection = collection(db, 'products');
-      let sortedQuery = query(productsCollection);
+    const applyFiltersAndSort = () => {
+      let filteredProducts = [...allProducts];
+
+      if (filter.colors) {
+        const selectedColors = Object.keys(filter.colors).filter(
+          (color) => filter.colors[color]
+        );
+        if (selectedColors.length > 0) {
+          filteredProducts = filteredProducts.filter((product) =>
+            selectedColors.includes(product.colors[0].color)
+          );
+        }
+      }
+
+      if (filter.sizes) {
+        const selectedSizes = Object.keys(filter.sizes).filter(
+          (size) => filter.sizes[size]
+        );
+        if (selectedSizes.length > 0) {
+          filteredProducts = filteredProducts.filter((product) =>
+            selectedSizes.some((size) => product.sizes.includes(size))
+          );
+        }
+      }
+
+       // Nuevo bloque para filtrar por rango de precios
+    if (filter.priceRange.from && filter.priceRange.to) {
+      filteredProducts = filteredProducts.filter((product) => {
+        const price = product.unit_price;
+        return price >= parseInt(filter.priceRange.from) && price <= parseInt(filter.priceRange.to);
+      });
+    }
 
       // Aplica la clasificación según la opción seleccionada
       if (sort.sortBy === "lowToHigh") {
-        sortedQuery = query(sortedQuery, orderBy("unit_price", "asc"));
+        filteredProducts.sort((a, b) => a.unit_price - b.unit_price);
       } else if (sort.sortBy === "highToLow") {
-        sortedQuery = query(sortedQuery, orderBy("unit_price", "desc"));
-      } else if (sort.sortBy === "newToOld") {
-        sortedQuery = query(sortedQuery, orderBy("createdAt", "desc"));
+        filteredProducts.sort((a, b) => b.unit_price - a.unit_price);
       } else if (sort.sortBy === "oldToNew") {
-        sortedQuery = query(sortedQuery, orderBy("createdAt", "asc"));
-      } else if (sort.sortBy === "aToZ") {
-        sortedQuery = query(sortedQuery, orderBy("title", "asc"));
-      } else if (sort.sortBy === "zToA") {
-        sortedQuery = query(sortedQuery, orderBy("title", "desc"));
+        filteredProducts.sort(
+          (a, b) => {
+            const dateA = new Date(a.createdAt.replace(/ de /g, ' ')).getTime();
+            const dateB = new Date(b.createdAt.replace(/ de /g, ' ')).getTime();
+            
+            return dateA - dateB;
+          }
+        );
+      } else if (sort.sortBy === "newToOld") {
+        filteredProducts.sort(
+          (a, b) => {
+            const dateA = new Date(a.createdAt.replace(/ de /g, ' ')).getTime();
+            const dateB = new Date(b.createdAt.replace(/ de /g, ' ')).getTime();
+            
+            return dateB - dateA;
+          }
+        );
       }
-      // Agrega más condiciones según las opciones de clasificación
+          
 
-      try {
-        const querySnapshot = await getDocs(sortedQuery);
-        const productsData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        } as Product));
-
-        setProducts(productsData);
-      } catch (error) {
-        console.error('Error al obtener productos clasificados:', error);
-      }
+    
+      setProducts(filteredProducts);
     };
 
-    fetchSortedProducts();
-  }, [sort]); // Asegúrate de incluir 'sort' como dependencia
+    applyFiltersAndSort();
+  }, [filter, sort, allProducts]);
+
+  // Restablece los productos cuando se quita un filtro
+  useEffect(() => {
+    if (!filter.colors && !filter.sizes) {
+      setProducts(allProducts);
+    }
+  }, [filter, allProducts]);
 
 
-  // Colores personalizados
+
+
   const customColors = {
     primary: {
       main: '#000',
@@ -158,7 +170,6 @@ const Shop: React.FC = () => {
     },
   };
 
-  // Estilos con enfoque sx
   const containerStyles = {
     padding: '8px',
   };
@@ -181,7 +192,6 @@ const Shop: React.FC = () => {
     borderBottom: "1px solid #000",
   };
   
-
   const productTitleStyles = {
     fontSize: "1rem",
     fontWeight: "bold",
@@ -220,68 +230,61 @@ const Shop: React.FC = () => {
   };
 
   const handleBuyClick = (product: Product) => {
-    // Crear un objeto CartItem basado en el producto con una cantidad inicial de 1
     const cartItem: CartItem = {
       ...product,
       quantity: 1,
     };
   
-    // Llama a la función addToCart del contexto para agregar el producto al carrito
     addToCart(cartItem);
-   
   };
   
   return (
     <div>
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={6} >
-          {/* Componente de filtros */}
-          <FilterProduct/>
-        </Grid>
-        <Grid item xs={6}>
-          {/* Componente de opciones de clasificación */}
-          <Sort />
-        </Grid>
+     <Grid container spacing={2} justifyContent="left" sx={{ marginLeft: 1}}>
+          <FilterProduct />
       </Grid>
-   
-    <Grid container spacing={1} sx={containerStyles}>
-      {products.map((product) => (
-        <Grid item xs={6} sm={6} md={6} lg={6} key={product.id}>
-          <Card sx={productStyles}>
-          <img src={product.images[0]} alt={product.title} style={productImageStyles} />
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
-                {product.title}
-              </Typography>
-              <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
-                Precio: ${product.unit_price}
-              </Typography>
-              <Box sx={buttonContainerStyles}>
-                <Button
-                   onClick={() => handleBuyClick(product)} 
-                   variant="contained"
-                   color="primary"
-                   size="small"
-                   sx={productCartStyles}
-                >
-                  Comprar
-                </Button>
-                <IconButton
-                  component={Link}
-                  to={`/itemDetail/${product.id}`}
-                  aria-label="Ver"
-                  color="secondary"
-                  size="small"
-                  sx={productDetailStyles}
-                >
-                  <VisibilityIcon sx={iconStyles} />
-                </IconButton>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+      <Grid container spacing={2} justifyContent="left" sx={{ margin: 1, marginTop: 1}}>
+          <AppliedFilters/>
+      </Grid>
+
+      <Grid container spacing={1} sx={containerStyles}>
+        {products.map((product) => (
+          <Grid item xs={6} sm={6} md={6} lg={6} key={product.id}>
+            <Card sx={productStyles}>
+              <img src={product.images[0]} alt={product.title} style={productImageStyles} />
+              <CardContent>
+                <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
+                  {product.title}
+                </Typography>
+                <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
+                  Precio: ${product.unit_price}
+                </Typography>
+                <Box sx={buttonContainerStyles}>
+                  <Button
+                     onClick={() => handleBuyClick(product)} 
+                     variant="contained"
+                     color="primary"
+                     size="small"
+                     sx={productCartStyles}
+                  >
+                    Comprar
+                  </Button>
+                  <IconButton
+                    component={Link}
+                    to={`/itemDetail/${product.id}`}
+                    aria-label="Ver"
+                    color="secondary"
+                    size="small"
+                    sx={productDetailStyles}
+                  >
+                    <VisibilityIcon sx={iconStyles} />
+                  </IconButton>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 import Home from "../pages/home/Home";
 import ItemDetail from "../components/pageComponents/itemDetail/ItemDetail";
 import Shop from "../pages/shop/Shop";
-import UserOrders from "../components/pageComponents/userOrders/UserOrders";
+import UserOrders from "../pages/UserAccount/UserAccount";
 import Search from "../pages/search/Search";
 
 

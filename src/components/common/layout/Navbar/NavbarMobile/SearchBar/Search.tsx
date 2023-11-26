@@ -6,34 +6,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from "react-router-dom";
 import { useSearchContext } from "../../../../../../context/SearchContext"; 
 import { CartContext } from "../../../../../../context/CartContext";
+import { Product, CartItem } from '../../../../../../type/type';
 
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: string[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string;
-}
-
-interface CartItem extends Product {
-    quantity: number; 
-  }
 
 const Search: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -41,7 +15,6 @@ const Search: React.FC = () => {
   const { addToCart } = useContext(CartContext)!; 
   const { searchKeyword } = useSearchContext()!;
 
-  console.log(searchKeyword);
 
   
   useEffect(() => {

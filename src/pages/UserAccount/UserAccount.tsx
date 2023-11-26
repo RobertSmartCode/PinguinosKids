@@ -7,6 +7,13 @@ import {
   where,
   DocumentData,
 } from "firebase/firestore";
+import {
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+} from '@mui/material';
 import { AuthContext } from "../../context/AuthContext";
 import firebase from 'firebase/app'; 
 import 'firebase/firestore';
@@ -18,6 +25,8 @@ interface Order {
     id: string;
     title: string;
     quantity: number;
+    unit_price: number;
+    images: string
   }>;
   shippingCost: number;
   total: number;
@@ -32,16 +41,14 @@ interface Order {
   };
 }
 
-
-const UserOrders = () => {
+const UserOrders : React.FC = () => {
   const [myOrders, setMyOrders] = useState<Order[]>([]);
   const { user } = useContext(AuthContext)!;
-
   useEffect(() => {
     const ordersCollection = collection(db, "orders");
     const ordersFiltered = query(
       ordersCollection,
-      where("email", "==", user.email)
+      where("userData.email", "==", user.email)
     );
 
     getDocs(ordersFiltered)
@@ -55,36 +62,84 @@ const UserOrders = () => {
       .catch((error) => console.log(error));
   }, [user.email]);
 
-  console.log(myOrders);
 
   return (
     <div>
-      <h1>Estoy en mis órdenes</h1>
+       <Typography variant="h6" style={{ textAlign: 'center' }}>Mis Compras </Typography>
       {myOrders.map((order) => (
-        <div key={order.id} style={{ border: "2px solid black", color:"black" }}>
-          <p>Fecha de la orden: {order.date.toDate().toLocaleString()}</p>
-          <p>Costo de envío: ${order.shippingCost}</p>
-          <h4>Detalles de la orden:</h4>
-          <ul>
-            {order?.items?.map((product, index) => (
-              <li key={index}>
-                <h2>{product.title}</h2>
-                <h3>Cantidad: {product.quantity}</h3>
-              </li>
+        <Card key={order.id} style={{ marginTop: '10px' }}>
+          <CardContent>
+          <Typography variant="h6"  style={{ textAlign: 'center' }}>
+                    Detalles de la orden
+          </Typography>
+            <Box>
+              <Grid container justifyContent="space-between" alignItems="center">
+                <Grid item xs={7}>
+                </Grid>
+                <Grid item xs={2} style={{ textAlign: 'right' }}>  
+                </Grid>
+              </Grid>
+            </Box>
+            <Grid item xs={12}>
+            </Grid>
+
+
+            {order.items.map((product) => (
+              <Grid item xs={12} key={product.id}>
+                <Card>
+                  <CardContent style={{ display: 'flex', alignItems: 'center' }}>
+                    <Grid container spacing={2}>
+                      {/* Asegúrate de que `product.images` y `product.unit_price` existan en tu estructura de datos */}
+                      <Grid item xs={4}>
+                        <img
+                          src={product.images[0]} // Reemplaza por la URL de la imagen del producto
+                          alt={product.title}
+                          style={{
+                            width: '80%',
+                            maxHeight: '100px',
+                            objectFit: 'contain',
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography variant="body2">
+                          {product.title} x {product.quantity}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4} style={{ textAlign: 'right' }}>
+                        <Typography variant="body1">
+                          ${product.unit_price * product.quantity}
+                        </Typography>
+                      </Grid>
+                    
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
-          </ul>
-          <h4>Total de la orden: ${order.total}</h4>
-          <h4>Información del usuario:</h4>
-          <p>Nombre: {order.userData.firstName} {order.userData.lastName}</p>
-          <p>Teléfono: {order.userData.phone}</p>
-          <p>Documento de identificación: {order.userData.identificationDocument}</p>
-          {/* Agrega más campos según la estructura de tu objeto userData */}
-        </div>
+
+            <Grid item xs={12} style={{ marginTop: '20px' }}>
+              <Typography variant="body1" style={{ textAlign: 'right' }}>
+                Sub Total (Sin Envío): ${order.total - order.shippingCost}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'right' }}>
+                Costo de envío: ${order.shippingCost}
+              </Typography>
+              <Typography variant="h6" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                Total: ${order.total}
+              </Typography>
+            </Grid>
+
+            <Typography variant="h6">
+                    Fecha:{order.date.toDate().toLocaleString()}
+                </Typography>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
-  
-  
+
+
 };
 
 export default UserOrders;
