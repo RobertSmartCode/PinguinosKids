@@ -47,9 +47,6 @@ const Search: React.FC = () => {
   }, [searchKeyword]);
 
 
-  // Resto del código de estilos y renderización similar al componente Shop
-  // ...
-
   
   // Colores personalizados
   const customColors = {

@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import Drawer from "@mui/material/Drawer";
-import { Box, Typography } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, Toolbar, Typography } from "@mui/material";
 
 import Search from "./Search"; 
 import { useSearchContext } from "../../../../../../context/SearchContext"; 
 
-interface SearchBarProps {
-  toggleSearch: () => void;
-  isSearchOpen: boolean;
-}
 
 
-const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => {
+
+const SearchBar: React.FC = () => {
 
 
   const {updateSearchKeyword } = useSearchContext()!;
   const [inputValue, setInputValue] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+  };
 
 
   useEffect(() => {
@@ -110,6 +112,18 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
 
   return (
     <Box sx={containerStyles}>
+
+        <IconButton
+          sx={{ color: customColors.primary.main }}
+          aria-label="search"
+          onClick={toggleSearch}
+          >
+          <SearchIcon />
+        </IconButton>
+
+        {isSearchOpen && (
+  <Toolbar>
+    
       <Drawer
         anchor="right"
         open={isSearchOpen}
@@ -164,6 +178,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
         </Box>
         <Search/>
       </Drawer>
+      </Toolbar>
+)}
       
     </Box>
   );

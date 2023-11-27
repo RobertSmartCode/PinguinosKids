@@ -13,9 +13,7 @@ import CartItemList from './CartItemList';
 import ShippingMethods from './ShippingMethods/ShippingMethods'; 
 import { Button } from '@mui/material';
 
-interface MobileCartProps {
-  onClick: () => void; 
-}
+
 
 export interface ShippingMethod {
   id: string;
@@ -26,7 +24,7 @@ export interface ShippingMethod {
 
 
 
-const MobileCart: React.FC<MobileCartProps> = () => {
+const MobileCart: React.FC = () => {
   const [cartOpen, setCartOpen] = useState(false);
  
 

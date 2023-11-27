@@ -1,15 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import {
-  IconButton,
+ 
   Toolbar,
   CssBaseline,
   AppBar,
   Box,
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import SearchIcon from "@mui/icons-material/Search";
+
 
 import { Outlet } from "react-router-dom";
 
@@ -33,28 +31,7 @@ const customColors = {
 
 
 const NavbarMobile = (props:any) => {
-  
   const { window } = props;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-  };
-
-
-  const handleCartClick = () => {
-  setIsCartOpen(!isCartOpen);
-};
-
-
-
   const [appBarHeight, setAppBarHeight] = useState<number | null>(null);
   const appBarRef = useRef<HTMLDivElement | null>(null); 
 
@@ -66,9 +43,7 @@ const NavbarMobile = (props:any) => {
     }
   }, []);
 
-
   const Top = `${appBarHeight || 0}px`
-
   const container = window !== undefined ? () => window().document.body : undefined;
 
 
@@ -77,82 +52,49 @@ const NavbarMobile = (props:any) => {
       <CssBaseline />
       <AppBar
         position="fixed"
-        ref={appBarRef} 
+        ref={appBarRef}
         sx={{
           width: "100%",
           zIndex: 1,
-          backgroundColor: customColors.secondary.main // Aquí se le cambia el color al fondo le navbar
+          backgroundColor: customColors.secondary.main,
         }}
       >
-       <Toolbar
-        sx={{
-        gap: "20px",
-        display: "flex",
-        justifyContent: "space-between",
-        }}
-    >
-    <div style={{ display: "flex", alignItems: "center" }}>
+        <Toolbar
+          sx={{
+            gap: "20px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          {/* Elementos a la izquierda */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {/* Logo de la Empresa */}
+            <MobileLogo />
+            {/* Campo de búsqueda */}
+            <SearchBar />
+          </div>
 
-    {/* Elementos a la izquierda (menú de hamburguesa y Logo de la empresa) */}
+          {/* Elementos a la derecha */}
+          <div style={{ display: "flex", alignItems: "center" }}>
 
+            {/* Menú de hamburguesa */}
 
-                                {/* Logo de la Empresa */}
+            <MobileMenuList
+             container={container}
+             Top={Top}
+             />
 
-      <MobileLogo  />
-      
-                                {/* Campo de búsqueda */}
-      <IconButton
-          sx={{ color: customColors.primary.main }}
-          aria-label="search"
-          onClick={toggleSearch}
-          >
-          <SearchIcon />
-        </IconButton>
-      </div>
+            {/* Icono del carrito */}
+            
+            <MobileCart />
 
-
-      <div style={{ display: "flex", alignItems: "center" }}>
-
-                          {/* Menú de hamburguesa */}
-
-      <IconButton
-            color="secondary"
-            aria-label="toggle menu"
-            edge="start"
-            onClick={handleMenuToggle}
-          >
-        {isMenuOpen ? <CloseIcon sx={{ color: customColors.primary.main }} /> : <MenuIcon sx={{ color: customColors.primary.main }} />}
-      </IconButton>
-
-                               
-
-
-                           {/* Icono del carrito */}
-
-    <MobileCart  onClick={handleCartClick} />
-
-         
-
-
-
-
-          
-  </div>
-  
-</Toolbar>
+          </div>
+        </Toolbar>
 
       </AppBar>
 
-                   {/* Lista de menú */}
-
-     <Box component="nav" aria-label="mailbox folders">
-     <MobileMenuList
-          handleMenuToggle={handleMenuToggle}
-          isMenuOpen={isMenuOpen}
-          container={container}
-          Top={Top}
-        />
-     </Box>
+      {/* Contenedor component="main" para <Outlet /> */}
+      
       <Box
         component="main"
         sx={{
@@ -163,15 +105,7 @@ const NavbarMobile = (props:any) => {
           px: 2,
         }}
       >
-  <Toolbar />
-
-  {isSearchOpen && (
-  <Toolbar>
-    <SearchBar isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
-  </Toolbar>
-)}
-
-
+        <Toolbar />
         <Outlet />
       </Box>
     </Box>

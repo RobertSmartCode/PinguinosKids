@@ -1,11 +1,13 @@
 
+import IconButton from '@mui/material/IconButton';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 function ShoppingCart() {
   // Lógica y diseño del ícono del carrito aquí
   return (
-    <div className="shopping-cart-icon">
-      <img src="/ruta-al-icono.png" alt="Icono del carrito" />
-    </div>
+    <IconButton color="inherit" className="shopping-cart-icon" sx={{ marginRight: 4 }}>
+      <ShoppingCartIcon sx={{ fontSize: 46 }} />
+    </IconButton>
   );
 }
 
