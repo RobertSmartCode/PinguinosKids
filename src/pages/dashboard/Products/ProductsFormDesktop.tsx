@@ -56,7 +56,7 @@ const ProductsFormDesktop: React.FC= ({
 
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [isChange, setIsChange] = useState<boolean>(false);
-
+  console.log(isChange)
 const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
 const [colorErrors, setColorErrors] = useState<{ [key: string]: string }>({});
