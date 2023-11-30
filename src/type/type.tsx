@@ -1,5 +1,5 @@
 
-import firebase from 'firebase/app';
+
 import 'firebase/firestore';
 
 
@@ -55,9 +55,18 @@ export  interface ProductsFormProps {
   }
 
 export 
-interface Order {
+
+
+type MyCustomDateType = {
+  year: number;
+  month: number;
+  day: number;
+ 
+};
+
+export interface Order {
   id: string;
-  date: firebase.firestore.Timestamp;
+  date: MyCustomDateType;
   items: Array<{
     id: string;
     title: string;
