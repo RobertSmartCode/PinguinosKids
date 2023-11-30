@@ -183,6 +183,13 @@ const CouponValidation: React.FC = () => {
         label="¿Tienes un cupón de descuento?"
         variant="outlined"
         fullWidth
+        sx={{
+          "@media (min-width: 600px)": {
+            maxWidth: "500px",  // Ajusta el valor según tus necesidades
+            marginLeft: "auto", // Para centrar en modo escritorio
+            marginRight: "auto", // Para centrar en modo escritorio
+          },
+        }}
         name="couponCode"
         value={formik.values.couponCode}
         onChange={formik.handleChange}

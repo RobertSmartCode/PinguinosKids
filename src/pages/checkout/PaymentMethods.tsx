@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { MercadoPagoPayment } from "./MercadoPagoPayment";
+
 import { TransferPayment } from "./TransferPayment";
 import { CashPayment } from "./CashPayment";
 
@@ -67,9 +67,9 @@ const PaymentMethods = () => {
   return (
     <div>
       {showPaymentSelection ? (
-        <Grid container spacing={1} style={{ maxWidth: "100%", marginLeft: "30px", marginRight: "30px", marginTop: "10px" }}>
+        <Grid container spacing={1} sx={{ maxWidth: "100%", marginLeft: "30px", marginRight: "30px", marginTop: "10px", '@media (min-width:600px)': { maxWidth: '450px', margin: "auto", marginTop: "20px" } }}>
           {methods.map((method) => (
-            <Grid item xs={10} key={method.id}>
+            <Grid item xs={10} lg={12}  key={method.id}>
               <Card
                 onClick={() => onSelect(method)}
                 style={{
@@ -107,7 +107,7 @@ const PaymentMethods = () => {
           {selectedMethod && (
            <div>
            {/* Renderiza el componente seleccionado según el nombre del método */}
-           {selectedMethod.name === "Mercado Pago" ? <MercadoPagoPayment /> :
+           {
              selectedMethod.name === "Efectivo" ? <CashPayment /> :
              selectedMethod.name === "Transferencias" && <TransferPayment />
            }

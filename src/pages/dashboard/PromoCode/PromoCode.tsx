@@ -110,7 +110,7 @@ const PromoCode: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </Box>
-        <Box>
+        <div style={{ margin: '0 auto', textAlign: 'center', marginTop:"20px", marginBottom:"20px" }}>
             <Button
             variant="contained"
             color="primary"
@@ -119,7 +119,7 @@ const PromoCode: React.FC = () => {
             {showForm ? 'Cerrar Formulario' : 'Crear Cupón'}
           </Button>
           {showForm && <PromoCodeForm />}
-        </Box>
+        </div>
        
         <PromoCodeList/>
       </Drawer>

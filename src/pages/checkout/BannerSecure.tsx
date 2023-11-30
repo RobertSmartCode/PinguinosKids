@@ -1,5 +1,5 @@
 import SecurityIcon from "@mui/icons-material/Security";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 const customColors = {
   primary: {
@@ -14,27 +14,33 @@ const customColors = {
 
 const BannerSecure: React.FC = () => {
   return (
+    <Grid container>
+  <Grid item xs={12} lg={12} >
     <Box
-      sx={{
+       sx={{
         display: "flex",
         alignItems: "center",
-        backgroundColor: customColors.primary.main, // Color de fondo
-        color: customColors.secondary.main, // Color del texto
-       
-        
+        justifyContent: "center", // Centrar verticalmente
+        backgroundColor: customColors.primary.main,
+        color: customColors.secondary.main,
+        margin: "auto",
+        width: "100%", // Ocupar todo el ancho horizontal
+        padding: "10px", // Ajustar el espacio interno según sea necesario
       }}
     >
-      <Typography sx={{ margin: 0,  marginLeft: "40px", marginRight: "10px" }}>
+      <Typography sx={{   marginRight: "20px", fontSize: "12px"}}>
         Compra Segura
       </Typography>
       <SecurityIcon
         sx={{
           fontSize: "36px", // Tamaño del icono
-          marginRight: "10px", // Espaciado derecho del icono
+          marginRight: "20px", // Espaciado derecho del icono
         }}
       />
-      <Typography sx={{ margin: 0 }}>100% Protegida</Typography>
+      <Typography sx={{  fontSize: "12px" }}>100% Protegida</Typography>
     </Box>
+    </Grid>
+    </Grid>
   );
 };
 

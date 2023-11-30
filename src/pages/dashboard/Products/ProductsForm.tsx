@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { db, uploadFile } from "../../firebase/firebaseConfig";
+import { db, uploadFile } from "../../../firebase/firebaseConfig";
 import { addDoc, collection, doc, updateDoc, CollectionReference} from "firebase/firestore";
 import {
   Button,
@@ -16,12 +16,13 @@ import {
 
 } from "@mui/material";
 import * as Yup from "yup";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ColorInput from './ColorInput';
-import { useColorsContext } from '../../context/ColorsContext'; 
-import { Product, ColorData, ProductsFormProps } from '../../type/type';
-import { getFormattedDate } from '../../utils/dateUtils';
-import { ErrorMessage } from '../../messages/ErrorMessage';
-import { productSchema } from '../../schema/productSchema';
+import { useColorsContext } from '../../../context/ColorsContext'; 
+import { Product, ColorData, ProductsFormProps } from '../../../type/type';
+import { getFormattedDate } from '../../../utils/dateUtils';
+import { ErrorMessage } from '../../../messages/ErrorMessage';
+import { productSchema } from '../../../schema/productSchema';
 
 
 const ProductsForm: React.FC<ProductsFormProps> = ({
@@ -32,6 +33,7 @@ const ProductsForm: React.FC<ProductsFormProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading] = useState<boolean>(false);
+ 
   const [newProduct, setNewProduct] = useState<Product>({
     id: "",
     title: "",
@@ -133,6 +135,8 @@ const [selectedProductColors, setSelectedProductColors] = useState<{ color: stri
     productSelected?.images.length || 0
   );
 
+ 
+
 
   useEffect(() => {
     if (productSelected) {
@@ -174,14 +178,20 @@ const normalizeImages = async (imageFiles: File[], existingImageURLs: string[]) 
 const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   if (e.target.files) {
     const selectedFiles = Array.from(e.target.files);
+   
+
     if (
       selectedFiles.length + selectedImageCount <= 8 &&
       selectedFiles.length + selectedImageCount >= 1
     ) {
       const updatedFiles = [...files, ...selectedFiles];
+      
+
       setFiles(updatedFiles);
+
       setSelectedImageCount(selectedImageCount + selectedFiles.length);
       setUploadMessage("");
+
       if (productSelected) {
         normalizeImages(selectedFiles, productSelected.images)
           .then((normalizedImages) => {
@@ -189,7 +199,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               ...productSelected,
               images: normalizedImages,
             };
-            console.log(updatedProductSelected.images);
+            console.log("Updated Product Selected:", updatedProductSelected);
             setProductSelected(updatedProductSelected);
           })
           .catch((error) => {
@@ -217,12 +227,21 @@ const handleRemoveImage = (index: number) => {
   if (productSelected) {
     const updatedProductSelected = {
       ...productSelected,
-      images: [...productSelected.images.slice(0, index), ...productSelected.images.slice(index + 1)],
+      images: [
+        ...productSelected.images.slice(0, index),
+        ...productSelected.images.slice(index + 1),
+      ],
     };
     setProductSelected(updatedProductSelected);
+
+    // Después de eliminar la imagen, actualiza el contador
+    setSelectedImageCount(updatedProductSelected.images.length);
+    setUploadMessage("");
+  } else {
+    setSelectedImageCount(updatedFiles.length);
+    setUploadMessage("");
   }
 };
-
 
   
 
@@ -667,53 +686,82 @@ const handleRemoveImage = (index: number) => {
   
             {/* Maneja la carga de las imagenes para Modificar */}
             <Grid item xs={12}>
-              <div style={{ maxHeight: "600px", overflowY: "scroll" }}>
+              <div style={{  maxHeight: "600px", overflowY: "scroll" }}>
                 {productSelected ? (
                   productSelected.images.map((imageUrl, index) => (
-                    <Card key={index} style={{ maxWidth: 345 }}>
+                    <Card key={index} style={{ maxWidth: 345,  marginRight:60,  borderRadius: '10px', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                     <CardContent
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <p>{`Vista Previa ${index + 1}`}</p>
+                        </CardContent>
+                     
                       <CardMedia
                         component="img"
                         height="140"
                         image={imageUrl}
                         alt={`Imagen ${index + 1}`}
-                        style={{ objectFit: "contain" }}
+                        style={{ objectFit: "contain", justifyContent: 'center' }}
                       />
-                      <CardContent>
-                        <p>{`Vista Previa ${index + 1}`}</p>
-                      </CardContent>
-                      <CardActions>
+                        
+                      <CardActions
+                       style={{
+                        marginLeft: 'auto', // Añade esta línea para mover el CardActions a la derecha
+                        width: 'fit-content', // Ajusta el ancho según sea necesario
+                      }}
+                      >
                         <Button
                           size="small"
                           variant="contained"
                           color="secondary"
                           onClick={() => handleRemoveImage(index)}
+                          
                         >
-                          Eliminar
+                           <DeleteForeverIcon />
                         </Button>
                       </CardActions>
                     </Card>
                   ))
                 ) : (
                   files.map((file, index) => (
-                    <Card key={index} style={{ maxWidth: 345 }}>
+                    <Card key={index} style={{ maxWidth: 345,  marginRight:60,  borderRadius: '10px', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                     <CardContent
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <p>{`Vista Previa ${index + 1}`}</p>
+                        </CardContent>
                       <CardMedia
                         component="img"
                         height="140"
                         image={URL.createObjectURL(file)}
                         alt={`Vista Previa ${index + 1}`}
-                        style={{ objectFit: "contain" }}
+                        style={{ objectFit: "contain", justifyContent: 'center', marginBottom:"20px" }}
                       />
-                      <CardContent>
-                        <p>{`Vista Previa ${index + 1}`}</p>
-                      </CardContent>
-                      <CardActions>
+                      
+                      <CardActions
+                       style={{
+                        marginLeft: 'auto', // Añade esta línea para mover el CardActions a la derecha
+                        width: 'fit-content', // Ajusta el ancho según sea necesario
+                      }}
+                      >
                         <Button
                           size="small"
                           variant="contained"
                           color="secondary"
                           onClick={() => handleRemoveImage(index)}
+                         
                         >
-                          Eliminar
+                           <DeleteForeverIcon />
                         </Button>
                       </CardActions>
                     </Card>

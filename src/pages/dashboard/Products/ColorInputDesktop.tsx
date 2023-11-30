@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, List, ListItem, ListItemText, Grid } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { useColorsContext } from '../../context/ColorsContext'; 
+import { useColorsContext } from '../../../context/ColorsContext'; 
 
-interface ColorInputProps {
+interface ColorInputDesktopProps {
   initialColors?: { color: string; sizes: string[]; quantities: number[] }[];
   updateColors: (newColors: { color: string; sizes: string[]; quantities: number[] }[]) => void;
 }
 
-const ColorInput: React.FC<ColorInputProps> = ({ initialColors}) => {
+const ColorInputDesktop: React.FC<ColorInputDesktopProps> = ({ initialColors}) => {
   const { colors, updateColors } = useColorsContext()!;
   const [color, setColor] = useState<string>("");
   const [size, setSize] = useState<string>("");
@@ -77,7 +77,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ initialColors}) => {
         <div key={index}>
           <List>
           <ListItem
-            style={{
+            sx={{
               paddingLeft: 0,
               marginLeft: 0,
               display: 'flex',
@@ -90,7 +90,13 @@ const ColorInput: React.FC<ColorInputProps> = ({ initialColors}) => {
               primary={`${colorData.color}`}
               style={{ display: 'flex', alignItems: 'center', listStyle: 'none', paddingLeft: 0, marginLeft: 0 }}
             />
-            <Button size="small" onClick={() => handleDeleteColor(index)} style={{ marginLeft: 'px', padding: 0 }}>
+            <Button size="small" onClick={() => handleDeleteColor(index)}  sx={{
+              marginLeft: '0px',
+              padding: 0, 
+              '@media (min-width: 768px)': {
+                marginRight: '880px',
+              },
+            }}>
               <DeleteForeverIcon />
             </Button>
           </ListItem>
@@ -128,11 +134,12 @@ const ColorInput: React.FC<ColorInputProps> = ({ initialColors}) => {
                 </Grid>
               </Grid>
             </ListItem>
+            
             <ListItem style={{ paddingLeft: 0 }}>
               <ul style={{ color: 'black', listStyle: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'right', paddingLeft: 0, marginLeft: 0 }}>
                 {colorData.sizes && colorData.sizes.map((size, sizeIndex) => (
                   <li key={sizeIndex} style={{ color: 'black', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>{`Talle:${size}, Cant.: ${colorData.quantities[sizeIndex]}`}</span>
+                  <span>{`Talle:${size}, Cantidad: ${colorData.quantities[sizeIndex]}`}</span>
                   <Button
                     size="small"
                     onClick={() => handleDeleteSize(index, sizeIndex)}
@@ -157,21 +164,35 @@ const ColorInput: React.FC<ColorInputProps> = ({ initialColors}) => {
           value={color}
           onChange={handleColorChange}
           fullWidth
-          sx={{ width: '75%', margin: 'auto'}}
+          sx={{
+            width: '75%',
+            margin: 'auto',
+            '@media (min-width: 768px)': {
+              width: '38%',
+              marginRight:"10px" 
+            },
+          }}
         />
 
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAddColor}
-        startIcon={<AddCircleOutlineIcon />}
-        sx={{ width: '75%', margin: 'auto', marginTop: '8px' }}
-      >
-        Agregar Color
-      </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddColor}
+          startIcon={<AddCircleOutlineIcon />}
+          sx={{
+            width: '75%',
+            margin: 'auto',
+            marginTop: '8px',
+            '@media (min-width: 768px)': {
+              width: '20%', // Ajusta el ancho para pantallas de escritorio (puedes ajustar el valor según tus necesidades)
+            },
+          }}
+        >
+          Agregar Color
+        </Button>
+        
     </div>
   );
 };
 
-export default ColorInput;
+export default ColorInputDesktop;

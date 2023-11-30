@@ -1,4 +1,6 @@
 
+import firebase from 'firebase/app'; 
+import 'firebase/firestore';
 
 export interface Product {
   id: string;
@@ -51,3 +53,29 @@ export  interface ProductsFormProps {
     updateColors: (newColors: { color: string; sizes: string[]; quantities: number[] }[]) => void;
   }
 
+export 
+interface Order {
+  id: string;
+  date: firebase.firestore.Timestamp;
+  items: Array<{
+    id: string;
+    title: string;
+    quantity: number;
+    unit_price: number;
+    images: string
+  }>;
+  shippingCost: number;
+  total: number;
+  userData: {
+    phone: string;
+    postalCode:number;
+    email:string;
+    city:string
+    identificationDocument: string;
+    otherPersonLastName: string;
+    isOtherPerson: boolean;
+    firstName: string;
+    lastName: string;
+    // Agrega otros campos según la estructura de userData
+  };
+}

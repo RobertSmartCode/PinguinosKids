@@ -1,38 +1,16 @@
-import {Box} from "@mui/material";
-import ProductAddForm from "./ProductAddForm";
-import ProductsList from "./ProductsList";
-import MyOrders from "./MyOrders";
-import PaymentMethodsList from "./PaymentMethodsList";
-import ShippingMethodsList from "./ShippingMethodsList";
-import StoreDataList from "./StoreDataList";
-import PromoCode from "./PromoCode";
+import { useMediaQuery } from "@mui/material";
+
+import DashboardMobile from "./DashboardMobile/DashboardMobile";
+import DashboardDesktop from "./DashboardDesktop/DashboardDesktop";
 
 
-const containerStyles = {
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  marginLeft: "80px", 
-  marginRight: "80px", 
-  gap:"20px"
 
-};
 
 const Dashboard: React.FC = () => {
+  // Utiliza 'useMediaQuery' para determinar si es móvil o no
+  const isMobile = useMediaQuery('(max-width:600px)');
 
-  return (
-    <Box 
-        sx={containerStyles}>
-        <MyOrders />
-        <ProductAddForm />
-        <ProductsList />
-        <PaymentMethodsList/>
-        <ShippingMethodsList/>
-        <StoreDataList/>
-        <PromoCode/>
-    </Box>
-  );
+  return isMobile ? <DashboardMobile /> : <DashboardDesktop />;
 };
 
 export default Dashboard;

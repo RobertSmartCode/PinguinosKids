@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 import {
   getDocs,
   collection,
@@ -12,36 +12,11 @@ import {
   CardContent,
   Box,
 } from '@mui/material';
-import firebase from 'firebase/app'; 
+
 import 'firebase/firestore';
+import {Order } from "../../../type/type"
 
-interface Order {
-  id: string;
-  date: firebase.firestore.Timestamp;
-  items: Array<{
-    id: string;
-    title: string;
-    quantity: number;
-    unit_price: number;
-    images: string
-  }>;
-  shippingCost: number;
-  total: number;
-  userData: {
-    phone: string;
-    postalCode:number;
-    email:string;
-    city:string
-    identificationDocument: string;
-    otherPersonLastName: string;
-    isOtherPerson: boolean;
-    firstName: string;
-    lastName: string;
-    // Agrega otros campos según la estructura de userData
-  };
-}
-
-const UserOrders : React.FC = () => {
+const MyOrdersDesktop : React.FC = () => {
   const [myOrders, setMyOrders] = useState<Order[]>([]);
  
   useEffect(() => {
@@ -61,10 +36,10 @@ const UserOrders : React.FC = () => {
 
 
   return (
-    <div>
+    <div  style={{ padding: "0px", margin:"0px"}} >
        
        {myOrders.map((order) => (
-  <Card key={order.id} style={{ marginTop: '10px' }}>
+  <Card key={order.id}  style={{ marginTop: '10px', marginRight: '110px' }}>
     <CardContent>
       <Typography variant="h6" style={{ textAlign: 'center' }}>
         Detalles de la orden
@@ -159,4 +134,4 @@ const UserOrders : React.FC = () => {
 
 };
 
-export default UserOrders;
+export default MyOrdersDesktop;

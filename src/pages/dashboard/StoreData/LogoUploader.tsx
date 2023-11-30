@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Button from "@mui/material/Button";
-import { uploadFile } from "../../firebase/firebaseConfig"; // Asegúrate de importar la función de carga de Firebase
+import { uploadFile } from "../../../firebase/firebaseConfig"; // Asegúrate de importar la función de carga de Firebase
 
 interface LogoUploaderProps {
   onLogoUpload: (imageUrl: string) => void;

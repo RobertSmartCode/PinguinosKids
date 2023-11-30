@@ -13,6 +13,7 @@ import CartItemList from './CartItemList';
 import ShippingMethods from './ShippingMethods/ShippingMethods'; 
 import { Button } from '@mui/material';
 
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 export interface ShippingMethod {
@@ -27,16 +28,15 @@ export interface ShippingMethod {
 const MobileCart: React.FC = () => {
   const [cartOpen, setCartOpen] = useState(false);
  
-
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
 
 
+  const { cart, getTotalPrice, getTotalQuantity,  updateShippingInfo } = useContext(CartContext)! ?? {};
+
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
 
   
-  const { cart, getTotalPrice, getTotalQuantity,  updateShippingInfo } = useContext(CartContext)! ?? {};
-
-
   const handleCartClick = () => {
     setCartOpen(!cartOpen);
   };
@@ -76,12 +76,12 @@ const handleShippingMethodSelect = (method: ShippingMethod) => {
 
   const cartIconStyles = {
     color: customColors.primary.main,
-    fontSize: '24px' 
+    fontSize: isDesktop ? '46px' : '24px',
   };
 
   const itemCountStyles = {
     color: customColors.primary.main,
-    fontSize: "1.2rem",
+    fontSize: isDesktop ? "1.6rem" : "1.2rem",
     marginTop: "-10px",
   };
 
@@ -129,6 +129,13 @@ const handleShippingMethodSelect = (method: ShippingMethod) => {
     color: customColors.secondary.main,
   };
 
+  const drawerPaperStyles = {
+    boxSizing: "border-box",
+    width: isDesktop ? "400px" : "100%",
+    height: "100%",
+    zIndex: 1300,
+  };
+
   return (
     <Box sx={cartContainerStyles}>
       <IconButton
@@ -148,12 +155,7 @@ const handleShippingMethodSelect = (method: ShippingMethod) => {
         sx={{
           display: { xs: "block" },
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: "100%",
-            height: "100%",
-            zIndex: 1300,
-          },
+          "& .MuiDrawer-paper": drawerPaperStyles
         }}
       >
         <Box sx={topBarStyles}>

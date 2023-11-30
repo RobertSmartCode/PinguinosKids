@@ -11,25 +11,22 @@ import {
   Grid,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { collection, addDoc} from "firebase/firestore";
+import { db } from "../../../firebase/firebaseConfig";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
-// Interfaz para los métodos de pago
-interface PaymentMethod {
+interface ShippingMethod {
   id: string;
   name: string;
-  description: string;
-  // Agrega otras propiedades específicas de los métodos de pago si es necesario
+  price: number;
 }
 
-// Props para el componente PaymentMethodsForm
-interface PaymentMethodsFormProps {
+interface ShippingMethodsFormProps {
   open: boolean;
   onClose: () => void;
-  methodToEdit?: PaymentMethod | null;
-  onUpdateMethod: (methodId: string, updatedMethod: PaymentMethod) => Promise<void>;
+  methodToEdit?: ShippingMethod | null;
+  onUpdateMethod: (methodId: string, updatedMethod: ShippingMethod) => Promise<void>;
 }
 
 const Transition = React.forwardRef<unknown, TransitionProps>((props: TransitionProps, ref: React.Ref<unknown>) => {
@@ -42,37 +39,39 @@ const Transition = React.forwardRef<unknown, TransitionProps>((props: Transition
 
 const validationSchema = yup.object({
   name: yup.string().required("El nombre es requerido"),
-  description: yup.string().required("La descripción es requerida"),
-  // Agrega validaciones para otras propiedades específicas si es necesario
+  price: yup.number().positive("El precio debe ser positivo").required("El precio es requerido"),
 });
-
-const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ open, onClose, methodToEdit, onUpdateMethod }) => {
+const ShippingMethodsForm: React.FC<ShippingMethodsFormProps> = ({
+  open,
+  onClose,
+  methodToEdit,
+  onUpdateMethod,
+}) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const formik = useFormik({
     initialValues: {
       name: methodToEdit?.name || "",
-      description: methodToEdit?.description || "",
-      // Incluye otras propiedades iniciales si es necesario
+      price: methodToEdit?.price || 0,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const paymentMethodsCollection = collection(db, "paymentMethods");
+        const shippingMethodsCollection = collection(db, "shippingMethods");
 
         if (methodToEdit) {
-          // Editar el método de pago existente
+          // Editar el método de envío existente
           await onUpdateMethod(methodToEdit.id, { ...values, id: methodToEdit.id });
         } else {
-          // Agregar un nuevo método de pago
-          await addDoc(paymentMethodsCollection, values);
+          // Agregar un nuevo método de envío
+          await addDoc(shippingMethodsCollection, values);
         }
 
         onClose();
       } catch (error) {
-        console.error("Error al guardar el método de pago:", error);
-        setSnackbarMessage("Error al guardar el método de pago.");
+        console.error("Error al guardar el método de envío:", error);
+        setSnackbarMessage("Error al guardar el método de envío.");
         setSnackbarOpen(true);
       }
     },
@@ -84,19 +83,17 @@ const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ open, onClose, 
       // Cuando el formulario se abre y se pasa un método para editar
       formik.setValues({
         name: methodToEdit.name || "",
-        description: methodToEdit.description || "",
-        // Incluye otras propiedades si es necesario
+        price: methodToEdit.price || 0,
       });
     } else {
       // Cuando el formulario se abre para agregar un nuevo método
       formik.resetForm();
     }
-  }, [open, methodToEdit]);
+  }, [open, methodToEdit]); // Agrega formik como dependencia si es necesario
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
-
   return (
     <Dialog open={open} onClose={onClose} TransitionComponent={Transition} fullWidth maxWidth="sm">
       <form onSubmit={formik.handleSubmit}>
@@ -118,18 +115,18 @@ const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ open, onClose, 
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Descripción"
-                  name="description"
-                  value={formik.values.description}
+                  label="Precio"
+                  name="price"
+                  type="number"
+                  value={formik.values.price}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   fullWidth
-                  error={formik.touched.description && !!formik.errors.description}
-                  helperText={formik.touched.description && formik.errors.description}
+                  error={formik.touched.price && !!formik.errors.price}
+                  helperText={formik.touched.price && formik.errors.price}
                   required
                 />
               </Grid>
-              {/* Agrega campos para otras propiedades si es necesario */}
             </Grid>
           </Container>
         </DialogContent>
@@ -147,4 +144,4 @@ const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ open, onClose, 
   );
 };
 
-export default PaymentMethodsForm;
+export default ShippingMethodsForm;

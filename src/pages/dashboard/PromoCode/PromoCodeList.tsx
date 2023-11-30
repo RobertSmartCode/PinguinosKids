@@ -16,7 +16,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../../../firebase/firebaseConfig';
 import { Tooltip } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 

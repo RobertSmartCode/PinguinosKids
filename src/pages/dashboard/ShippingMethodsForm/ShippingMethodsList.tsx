@@ -19,7 +19,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 import ShippingMethodsForm from "./ShippingMethodsForm";
 
 // Define el tipo ShippingMethod
@@ -158,6 +158,7 @@ const ShippingMethodsList: React.FC = () => {
         sx={{
           backgroundColor: customColors.primary.main,
           color: customColors.secondary.contrastText,
+          
         }}
       >
         Métodos de Envíos
@@ -189,13 +190,16 @@ const ShippingMethodsList: React.FC = () => {
           </IconButton>
         </Box>
         <Box>
-        <Button
-        variant="contained"
-        onClick={() => setOpenForm(true)}
-        style={{ marginBottom: "20px" }}
-      >
-        Agregar Método de Envío
-      </Button>
+        <div style={{ margin: '0 auto', textAlign: 'center', marginTop:"20px" }}>
+            <Button
+              variant="contained"
+              onClick={() => setOpenForm(true)}
+              style={{ marginBottom: "20px" }}
+            >
+              Agregar Método de Envío
+            </Button>
+          </div>
+
 
       <TableContainer component={Paper}>
         <Table>

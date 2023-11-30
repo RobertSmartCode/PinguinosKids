@@ -14,7 +14,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 import StoreDataForm from "./StoreDataForm"; // Importa el formulario de datos de la tienda
 
 

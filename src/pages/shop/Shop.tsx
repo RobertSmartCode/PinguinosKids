@@ -9,44 +9,9 @@ import { useFilterContext } from "../../context/FilterContext";
 import { useSortContext } from "../../context/SortContext";
 import { CartContext } from "../../context/CartContext";
 import AppliedFilters from "./AppliedFilters"; 
-
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: {
-    color: string;
-    sizes: string[];
-    quantities: number[];
-  }[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string; 
-}
-
-interface CartItem extends Product {
-  quantity: number;
-  colors: {
-    color: string;
-    sizes: string[];
-    quantities: number[];
-  }[];
-}
+import { Product, CartItem } from '../../type/type';
+import { useTheme, useMediaQuery } from '@mui/material';
+import Filter from "./Filter";
 
 const Shop: React.FC = () => {
  
@@ -55,7 +20,8 @@ const Shop: React.FC = () => {
   const { addToCart } = useContext(CartContext)!;
   const { filter } = useFilterContext()!;
   const { sort } = useSortContext()!;
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
 
   useEffect(() => {
@@ -126,7 +92,6 @@ const Shop: React.FC = () => {
           (a, b) => {
             const dateA = new Date(a.createdAt.replace(/ de /g, ' ')).getTime();
             const dateB = new Date(b.createdAt.replace(/ de /g, ' ')).getTime();
-            
             return dateA - dateB;
           }
         );
@@ -135,14 +100,11 @@ const Shop: React.FC = () => {
           (a, b) => {
             const dateA = new Date(a.createdAt.replace(/ de /g, ' ')).getTime();
             const dateB = new Date(b.createdAt.replace(/ de /g, ' ')).getTime();
-            
             return dateB - dateA;
           }
         );
       }
-          
 
-    
       setProducts(filteredProducts);
     };
 
@@ -240,53 +202,67 @@ const Shop: React.FC = () => {
   
   return (
     <div>
-     <Grid container spacing={2} justifyContent="left" sx={{ marginLeft: 1}}>
-          <FilterProduct />
-      </Grid>
-      <Grid container spacing={2} justifyContent="left" sx={{ margin: 1, marginTop: 1}}>
-          <AppliedFilters/>
-      </Grid>
-
-      <Grid container spacing={1} sx={containerStyles}>
-        {products.map((product) => (
-          <Grid item xs={6} sm={6} md={6} lg={6} key={product.id}>
-            <Card sx={productStyles}>
-              <img src={product.images[0]} alt={product.title} style={productImageStyles} />
-              <CardContent>
-                <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
-                  {product.title}
-                </Typography>
-                <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
-                  Precio: ${product.unit_price}
-                </Typography>
-                <Box sx={buttonContainerStyles}>
-                  <Button
-                     onClick={() => handleBuyClick(product)} 
-                     variant="contained"
-                     color="primary"
-                     size="small"
-                     sx={productCartStyles}
-                  >
-                    Comprar
-                  </Button>
-                  <IconButton
-                    component={Link}
-                    to={`/itemDetail/${product.id}`}
-                    aria-label="Ver"
-                    color="secondary"
-                    size="small"
-                    sx={productDetailStyles}
-                  >
-                    <VisibilityIcon sx={iconStyles} />
-                  </IconButton>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+      <Grid container spacing={2} sx={containerStyles}>
+        {/* Fila con Filter */}
+        <Grid item xs={12} md={isMobile ? 3 : 2} lg={isMobile ? 3 : 2}>
+          {isMobile ? (
+            <Grid container spacing={2} justifyContent="left" sx={{ marginLeft: 1 }}>
+              <FilterProduct />
+            </Grid>
+          ) : (
+            <Filter />
+          )}
+          {isMobile && (
+            <Grid container spacing={2} justifyContent="left" sx={{ margin: 1, marginTop: 1 }}>
+              <AppliedFilters />
+            </Grid>
+          )}
+        </Grid>
+  
+        {/* Productos */}
+        <Grid item container xs={12} md={isMobile ? 9 : 10} lg={isMobile ? 9 : 10} spacing={1}>
+          {products.map((product) => (
+            <Grid item xs={6} sm={4} md={3} lg={3} key={product.id}>
+              <Card sx={productStyles}>
+                <img src={product.images[0]} alt={product.title} style={productImageStyles} />
+                <CardContent>
+                  <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
+                    {product.title}
+                  </Typography>
+                  <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
+                    Precio: ${product.unit_price}
+                  </Typography>
+                  <Box sx={buttonContainerStyles}>
+                    <Button
+                      onClick={() => handleBuyClick(product)} 
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      sx={productCartStyles}
+                    >
+                      Comprar
+                    </Button>
+                    <IconButton
+                      component={Link}
+                      to={`/itemDetail/${product.id}`}
+                      aria-label="Ver"
+                      color="secondary"
+                      size="small"
+                      sx={productDetailStyles}
+                    >
+                      <VisibilityIcon sx={iconStyles} />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     </div>
   );
+  
+  
 };
 
 export default Shop;

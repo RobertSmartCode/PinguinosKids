@@ -121,15 +121,19 @@ const ShippingMethodCheckout = () => {
 
       <Grid container spacing={0}>
         {methods.map((method) => (
-          <Grid item xs={12} sm={6} md={4} key={method.id}>
+          <Grid item xs={12} sm={12} md={12} lg={12}  key={method.id}>
             {showAllOptions || method.selected ? (
               <Card
                 onClick={() => handleMethodClick(method)}
-                style={{
+                sx={{
                   cursor: "pointer",
                   backgroundColor: method.selected ? "#e0e0e0" : "white",
                   display: "flex",
                   flexDirection: "column",
+                  '@media (min-width:600px)': {
+                    maxWidth: '500px',
+                    margin: 'auto',
+                  },
                 }}
               >
                 <CardContent

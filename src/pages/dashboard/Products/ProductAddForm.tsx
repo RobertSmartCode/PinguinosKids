@@ -5,11 +5,11 @@ import {
     collection,
     getDocs,
   } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 import CloseIcon from "@mui/icons-material/Close";
-import { useColorsContext } from '../../context/ColorsContext'; 
+import { useColorsContext } from '../../../context/ColorsContext'; 
 
-import { Product} from '../../type/type';
+import { Product} from '../../../type/type';
 
 
 const ProductAddForm = () => {

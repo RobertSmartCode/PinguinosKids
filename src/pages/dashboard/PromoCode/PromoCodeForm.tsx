@@ -3,7 +3,7 @@ import { Button, TextField, Box, Typography, Container, Paper } from '@mui/mater
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../../../firebase/firebaseConfig';
 
 
 // Función para generar un código aleatorio

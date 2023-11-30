@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 
 // import LogoUploader from './LogoUploader';
 import { useFormik } from "formik";

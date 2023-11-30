@@ -22,7 +22,16 @@ const UserInfo = () => {
 
 
   return (
-    <Card style={{ margin: "auto", maxWidth: 280, padding: 24 }}>
+    <Card
+        sx={{
+          margin: 'auto',
+          maxWidth: '280px',
+          padding: '24px',
+          '@media (min-width:600px)': {
+            maxWidth: '450px',
+          },
+        }}
+>
       <CardContent style={{ position: "relative" }}>
       <Button
           variant="contained"

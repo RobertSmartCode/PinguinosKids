@@ -60,58 +60,60 @@ const ShippingMethods: React.FC<ShippingMethodsProps> = ({ onSelectMethod,initia
   };
 
   return (
-    <Grid container spacing={2} >
-      {methods.map((method) => (
-        <Grid item xs={12} sm={6} md={4} key={method.id}>
-          <Card
-            onClick={() => {
-              // Marcar el método como seleccionado
-              const updatedMethods = methods.map((m) => ({
-                ...m,
-                selected: m.id === method.id,
-              }));
-              setMethods(updatedMethods);
+<Grid container spacing={2}>
+  {methods.map((method) => (
+    <Grid item xs={12} sm={12} md={12} key={method.id}>
+      <Card
+        onClick={() => {
+          // Marcar el método como seleccionado
+          const updatedMethods = methods.map((m) => ({
+            ...m,
+            selected: m.id === method.id,
+          }));
+          setMethods(updatedMethods);
 
-              // Llamar a la función onSelectMethod con el método seleccionado
-              onSelectMethod(method);
-            }}
-            style={{
-              cursor: "pointer",
-              backgroundColor: method.selected ? "#e0e0e0" : "white",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-          
-          <CardContent style={{ flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <Checkbox
-                checked={method.selected}
-                onChange={() => {
-                    // Marcar el método como seleccionado
-                    const updatedMethods = methods.map((m) => ({
-                    ...m,
-                    selected: m.id === method.id,
-                    }));
-                    setMethods(updatedMethods);
+          // Llamar a la función onSelectMethod con el método seleccionado
+          onSelectMethod(method);
+        }}
+        style={{
+          cursor: "pointer",
+          backgroundColor: method.selected ? "#e0e0e0" : "white",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <CardContent style={{ flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+            <Checkbox
+              checked={method.selected}
+              onChange={() => {
+                // Marcar el método como seleccionado
+                const updatedMethods = methods.map((m) => ({
+                  ...m,
+                  selected: m.id === method.id,
+                }));
+                setMethods(updatedMethods);
 
-                    onSelectMethod(method);
-                }}
-                style={{ marginRight: "10px" }} // Margen a la derecha del Checkbox
-                />
-                <Typography variant="body1" component="div" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {method.name}
-                </Typography>
-            </div>
-            <Typography variant="body1" color="text.secondary" style={{  paddingRight: '35px'  }}>
-                ${method.price}
+                onSelectMethod(method);
+              }}
+              style={{ marginRight: "10px" }}
+            />
+            <Typography variant="body1" component="div">
+              {method.name}
             </Typography>
-            </CardContent>
-
-          </Card>
-        </Grid>
-      ))}
+          </div>
+          <Typography variant="body1" color="text.secondary">
+            ${method.price}
+          </Typography>
+        </CardContent>
+      </Card>
     </Grid>
+  ))}
+</Grid>
+
+  
   );
 };
 

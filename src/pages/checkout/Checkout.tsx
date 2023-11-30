@@ -25,7 +25,6 @@ const Checkout: React.FC = () => {
       }}
     >
     
-     
               <BannerSecure/>
               <Banner/>
               <CartCheckout/>

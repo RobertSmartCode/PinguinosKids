@@ -7,6 +7,7 @@ import SortContextComponent from "./context/SortContext";
 import SearchContextComponent from "./context/SearchContext";
 import ColorsContextComponent from "./context/ColorsContext";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import SelectedItemsContextComponent from "./context/SelectedItems";
 
 const theme = createTheme({
   palette: {
@@ -25,7 +26,9 @@ function App() {
 
   return (
   <ThemeProvider theme={theme}>
+
     <BrowserRouter>
+    <SelectedItemsContextComponent>
       <ColorsContextComponent>
         <SearchContextComponent>
           <SortContextComponent>
@@ -39,6 +42,7 @@ function App() {
           </SortContextComponent>
         </SearchContextComponent>
       </ColorsContextComponent>
+      </SelectedItemsContextComponent>
     </BrowserRouter>
   </ThemeProvider>
 

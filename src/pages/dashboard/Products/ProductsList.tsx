@@ -2,15 +2,15 @@ import  { useEffect, useState } from "react";
 import { Button, IconButton, Modal, TableBody, TableCell, TableContainer, TableHead, Paper, TableRow, Table, Drawer, Typography,} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { db } from "../../firebase/firebaseConfig";
-import { useColorsContext } from '../../context/ColorsContext'; 
+import { db } from "../../../firebase/firebaseConfig";
+import { useColorsContext } from '../../../context/ColorsContext'; 
 import {
   collection,
   doc,
   deleteDoc,
   onSnapshot
 } from "firebase/firestore";
-import { Product} from '../../type/type';
+import { Product} from '../../../type/type';
 
 import Box from "@mui/material/Box";
 import ProductsForm from "./ProductsForm";
@@ -203,15 +203,15 @@ const ProductsList = () => {
                 <TableCell component="th" scope="row" align="center">
                   {product.stock}
                 </TableCell>
-                {/* <TableCell component="th" scope="row" align="center">
+                <TableCell component="th" scope="row" align="center">
                   {product.category}
-                </TableCell> */}
+                </TableCell> 
                 <TableCell component="th" scope="row" align="center">
                   <IconButton onClick={() => handleOpen(product)}>
-                    <EditIcon color="secondary" />
+                    <EditIcon color="primary" />
                   </IconButton>
                   <IconButton onClick={() => deleteProduct(product.id)}>
-                    <DeleteForeverIcon color="secondary" />
+                    <DeleteForeverIcon color="primary" />
                   </IconButton>
                 </TableCell>
               </TableRow>

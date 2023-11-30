@@ -18,7 +18,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db } from "../../../firebase/firebaseConfig";
 import PaymentMethodsForm from "./PaymentMethodsForm"; // Cambio en la importación
 
 // Define el tipo PaymentMethod (actualizado con propiedades específicas de pago)
@@ -186,6 +186,7 @@ const PaymentMethodsList: React.FC = () => {
           </IconButton>
         </Box>
         <Box>
+        <div style={{ margin: '0 auto', textAlign: 'center', marginTop:"20px" }}>
           <Button
             variant="contained"
             onClick={() => setOpenForm(true)}
@@ -193,6 +194,7 @@ const PaymentMethodsList: React.FC = () => {
           >
             Agregar Método de Pago
           </Button>
+          </div>
 
           <TableContainer component={Paper}>
             <Table>

@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +9,8 @@ const MobileLogo: React.FC = () => {
   const logoUrl = "https://firebasestorage.googleapis.com/v0/b/pinguinos-kids.appspot.com/o/LogoMobile%2FInfinty2.PNG?alt=media&token=a7524908-493f-4a63-b6ae-fa776fd66dca";
 
   return (
-    <Link to="/" style={{ color: "whitesmoke", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 10px 10px 0px", padding: "10px" }}>
+    <Box marginLeft="0px" marginRight="0px">
+    <Link to="/" style={{ color: "whitesmoke", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", margin: "0px 0px 0px 0px", padding: "0px" }}>
       <img
         src={logoUrl}
         alt={alt}
@@ -18,6 +20,7 @@ const MobileLogo: React.FC = () => {
         }}
       />
     </Link>
+    </Box>
   );
 };
 

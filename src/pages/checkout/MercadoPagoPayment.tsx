@@ -78,16 +78,17 @@ const userData = getCustomerInformation()
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "20px", marginBottom: "20px" }}>
+    <div style={{ textAlign: "center", marginTop: "20px", marginBottom: "20px", maxWidth: "300px", margin: "auto" }}>
     <h2 style={{ color: "black" }}>Mercado Pago</h2>
-    {isLoading ? ( // Muestra el icono de carga mientras isLoading es true
-                  <h4 style={{ color: "black" }}>Cargando...</h4>
+    {isLoading ? (
+      <h4 style={{ color: "black" }}>Cargando...</h4>
     ) : (
       preferenceId && (
         <Wallet initialization={{ preferenceId, redirectMode: "self" }} />
       )
     )}
   </div>
+  
   );
 };
 
