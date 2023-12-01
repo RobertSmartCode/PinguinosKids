@@ -121,7 +121,7 @@ const MyOrdersDesktop : React.FC = () => {
       </Grid>
 
       <Typography variant="h6">
-        Fecha: {order.date.toDate().toLocaleString()}
+        Fecha: {order.date.toLocaleString()} 
       </Typography>
     </CardContent>
   </Card>

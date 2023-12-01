@@ -1,8 +1,4 @@
 
-
-import 'firebase/firestore';
-
-
 export interface Product {
   id: string;
   title: string;
@@ -54,19 +50,9 @@ export  interface ProductsFormProps {
     updateColors: (newColors: { color: string; sizes: string[]; quantities: number[] }[]) => void;
   }
 
-export 
-
-
-type MyCustomDateType = {
-  year: number;
-  month: number;
-  day: number;
- 
-};
-
 export interface Order {
   id: string;
-  date: MyCustomDateType;
+  date: Date;
   items: Array<{
     id: string;
     title: string;
