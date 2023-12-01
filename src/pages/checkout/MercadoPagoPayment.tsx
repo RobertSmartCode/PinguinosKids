@@ -63,7 +63,7 @@ const userData = getCustomerInformation()
     });
 
     try {
-      const response = await axios.post("https://back-ecommerce-nu.vercel.app/create_preference", {
+      const response = await axios.post("https://back-ecommerce-phi.vercel.app/create_preference", {
         items: newArray,
         shipment_cost: shippingCost
       });
