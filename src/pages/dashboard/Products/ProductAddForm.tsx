@@ -34,7 +34,7 @@ const ProductAddForm = () => {
               images: productData.images || [],
               sizes: productData.sizes || [],
               colors: productData.colors || [],
-              salesCount: productData.salesCount || 0,
+              salesCount: productData.salesCount || "",
               featured: productData.featured || false,
               createdAt: productData.createdAt || "",
               keywords: productData.keywords || [],

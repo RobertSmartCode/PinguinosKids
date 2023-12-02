@@ -11,7 +11,7 @@ export interface Product {
   colors: { color: string; sizes: string[]; quantities: number[] }[];
   sku: string;
   keywords: string[];
-  salesCount: number;
+  salesCount: string;
   featured: boolean;
   images: string[];
   createdAt: string;

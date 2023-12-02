@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import { useFilterContext } from "../../context/FilterContext";
 import Sort from "./Sort"; 
 import useMediaQuery from '@mui/material/useMediaQuery';
+import PriceRangeFilter from "./PriceRangeFilter";
 
 const Filter: React.FC = () => {
 
@@ -95,7 +96,9 @@ const Filter: React.FC = () => {
 
       {isMobile ? (
         // Móvil
+        
         <div style={{ marginBottom: "16px", marginTop: "16px", marginLeft: "8px", display: "flex", flexDirection: "row", alignItems: "center" }}>
+       
         <h4 style={{ marginRight: "4px" }}>Precio:</h4>
         <TextField
           label="Desde"
@@ -131,42 +134,44 @@ const Filter: React.FC = () => {
       </div>
       ) : (
         // Escritorio
+        
         <div style={{ marginBottom: "16px", marginTop: "16px", marginLeft: "8px", display: "flex", flexDirection: "column", alignItems: "start" }}>
-  <h4 style={{ marginBottom: "4px" }}>Precio:</h4>
-  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "10px" }}>
-    <TextField
-      label="Desde"
-      variant="outlined"
-      size="small"
-      style={{ width: "80px", marginRight: "8px" }}
-      value={tempPriceRange.from}
-      onChange={(e) => handlePriceChange("from", e.target.value)}
-    />
-    <TextField
-      label="Hasta"
-      variant="outlined"
-      size="small"
-      style={{ width: "80px", marginRight: "8px" }}
-      value={tempPriceRange.to}
-      onChange={(e) => handlePriceChange("to", e.target.value)}
-    />
-  </div>
-  <Button
-    variant="contained"
-    color="primary"
-    size="small"
-    onClick={handleApplyFilters}
-    style={{
-      backgroundColor: customColors.primary.main,
-      color: customColors.secondary.main,
-      fontSize: '12px',
-      borderRadius: '12px',
-      padding: '8px 16px',
-    }}
-  >
-    Aplicar
-  </Button>
-</div>
+        <PriceRangeFilter/>
+        <h4 style={{ marginBottom: "4px" }}>Precio:</h4>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "10px" }}>
+          <TextField
+            label="Desde"
+            variant="outlined"
+            size="small"
+            style={{ width: "80px", marginRight: "8px" }}
+            value={tempPriceRange.from}
+            onChange={(e) => handlePriceChange("from", e.target.value)}
+          />
+          <TextField
+            label="Hasta"
+            variant="outlined"
+            size="small"
+            style={{ width: "80px", marginRight: "8px" }}
+            value={tempPriceRange.to}
+            onChange={(e) => handlePriceChange("to", e.target.value)}
+          />
+        </div>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={handleApplyFilters}
+          style={{
+            backgroundColor: customColors.primary.main,
+            color: customColors.secondary.main,
+            fontSize: '12px',
+            borderRadius: '12px',
+            padding: '8px 16px',
+          }}
+        >
+          Aplicar
+        </Button>
+      </div>
 
       )}
 

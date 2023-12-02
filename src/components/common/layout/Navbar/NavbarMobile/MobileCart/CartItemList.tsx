@@ -118,7 +118,7 @@ const CartItemList = () => {
                           </Typography>
                           <CardActions>
                             <IconButton
-                              color="secondary"
+                              color="primary"
                               onClick={() => deleteById && deleteById(product.id)}
                               style={{ paddingLeft: '40px'  }}
                             >

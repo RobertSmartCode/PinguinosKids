@@ -23,43 +23,7 @@ import IconButton from '@mui/material/IconButton';
 import PaymentMethodsInfo from "./PaymentMethodsInfo"; 
 import ShippingMethodsInfo from "./ShippingMethodsInfo"; 
 import ProductDetailsInfo from "./ProductDetailsInfo"; 
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  unit_price: number;
-  discount: number;
-  stock: number;
-  sizes: string[];
-  colors: {
-    color: string;
-    sizes: string[];
-    quantities: number[];
-  }[];
-  sku: string;
-  keywords: string[];
-  salesCount: number;
-  featured: boolean;
-  images: string[];
-  createdAt: string;
-  elasticity: string; 
-  thickness: string; 
-  breathability: string;
-  season: string; 
-  material: string; 
-  details: string; 
-}
-
-interface CartItem extends Product {
-  quantity: number;
-  colors: {
-    color: string;
-    sizes: string[];
-    quantities: number[];
-  }[];
-}
+import {CartItem } from "../../../type/type"
 
 const customColors = {
   primary: {

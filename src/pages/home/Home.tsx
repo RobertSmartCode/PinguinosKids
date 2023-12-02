@@ -1,9 +1,15 @@
 import React from "react";
+import HomeBanner from "./HomeBanner";
+import BestSellers from "./BestSellers";
+import NewArrivals from "./NewArrivals";
 
 const Home: React.FC = () => {
   return (
     <div>
-      <h1>Este es el home</h1>
+      <HomeBanner/>
+      <NewArrivals/>
+      <BestSellers/>
+      
     </div>
   );
 };

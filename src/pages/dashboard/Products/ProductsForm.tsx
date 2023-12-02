@@ -47,7 +47,7 @@ const ProductsForm: React.FC<ProductsFormProps> = ({
     images: [],
     sku: "",
     keywords: [],
-    salesCount: 0,
+    salesCount: "",
     featured: false,
     createdAt: getFormattedDate(),
     elasticity: "",

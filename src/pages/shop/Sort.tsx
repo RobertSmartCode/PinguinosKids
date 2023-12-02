@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useSortContext } from "../../context/SortContext"; // Importa el hook de contexto de clasificación
-
-import SortIcon from '@mui/icons-material/Sort';
-
+import { useSortContext } from "../../context/SortContext";
+import SortIcon from "@mui/icons-material/Sort";
 
 const Sort: React.FC = () => {
-  const { updateSort } = useSortContext()!; // Utiliza el hook de contexto de clasificación
-  
+  const { updateSort, sort } = useSortContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -20,63 +17,75 @@ const Sort: React.FC = () => {
   };
 
   const handleSelectSortOption = (option: string) => {
-    updateSort({ sortBy: option }); // Actualiza el contexto de clasificación con la opción seleccionada
+    updateSort({ sortBy: option });
     handleCloseMenu();
+  };
+
+  const translateSortOption = (option: string): string => {
+    // Tabla de conversión
+    const translations: { [key: string]: string } = {
+      default: "Ordenar",
+      lowToHigh: "Menor Precio",
+      highToLow: "Mayor Precio",
+      newToOld: "Nuevos a Viejos",
+      oldToNew: "Viejos a Nuevos",
+      bestSellers: "Más Vendidos",
+    };
+
+    return translations[option] || option;
   };
 
   const customColors = {
     primary: {
-      main: '#000',
-      contrastText: '#000',
+      main: "#000",
+      contrastText: "#000",
     },
     secondary: {
-      main: '#fff',
-      contrastText: '#fff',
+      main: "#fff",
+      contrastText: "#fff",
     },
   };
 
-  
   return (
-    <div style={{ textAlign: 'center' }}>
-      <button 
+    <div style={{ textAlign: "center" }}>
+      <button
         onClick={handleOpenMenu}
-        style={{ 
+        style={{
           backgroundColor: customColors.secondary.main,
           color: customColors.primary.main,
-          padding: '8px 16px',
+          padding: "8px 16px",
           border: `1px solid ${customColors.primary.main}`,
-          borderRadius: '4px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          marginLeft: '8px',
+          borderRadius: "4px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          marginLeft: "8px",
         }}
       >
-        Ordenar
-        <SortIcon style={{ marginLeft: '4px' }} />
+        {sort ? translateSortOption(sort.sortBy) : "Ordenar"}
+        <SortIcon style={{ marginLeft: "4px" }} />
       </button>
 
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+      {sort && sort.sortBy !== "default" && (
+          <MenuItem onClick={() => handleSelectSortOption("default")}>
+            {"Quitar Filtro"}
+          </MenuItem>
+        )}
         <MenuItem onClick={() => handleSelectSortOption("lowToHigh")}>
-          Menor Precio
+          {translateSortOption("lowToHigh")}
         </MenuItem>
         <MenuItem onClick={() => handleSelectSortOption("highToLow")}>
-          Mayor Precio
+          {translateSortOption("highToLow")}
         </MenuItem>
-      
         <MenuItem onClick={() => handleSelectSortOption("newToOld")}>
-          Nuevos a Viejos
+          {translateSortOption("newToOld")}
         </MenuItem>
         <MenuItem onClick={() => handleSelectSortOption("oldToNew")}>
-          Viejos a Nuevos
+          {translateSortOption("oldToNew")}
         </MenuItem>
         <MenuItem onClick={() => handleSelectSortOption("bestSellers")}>
-          Más Vendidos
+          {translateSortOption("bestSellers")}
         </MenuItem>
       </Menu>
     </div>

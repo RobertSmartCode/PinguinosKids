@@ -1,3 +1,4 @@
+// BestSellers.tsx
 import React, { useEffect, useState, useContext } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { getDocs, collection } from "firebase/firestore";
@@ -9,9 +10,10 @@ import {Product, CartItem} from "../../type/type"
 
 
 
-const ItemListContainer: React.FC = () => {
+const BestSellers: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useContext(CartContext)!; 
+
   useEffect(() => {
     let refCollection = collection(db, "products");
     getDocs(refCollection)
@@ -20,10 +22,22 @@ const ItemListContainer: React.FC = () => {
           return { ...product.data(), id: product.id } as Product;
         });
 
+        // Ordenar los productos por salesCount
+        newArray.sort((a, b) => parseInt(b.salesCount, 10) - parseInt(a.salesCount, 10));
+
         setProducts(newArray);
       })
       .catch((err) => console.log(err));
   }, []);
+
+  
+
+// // Imprime todos los valores de salesCount usando el estado del componente
+// console.log("SalesCount de todos los productos:", products.map((product) => `${product.title}: ${product.salesCount}`));
+
+
+  
+  
 
   // Colores personalizados
   const customColors = {
@@ -40,6 +54,7 @@ const ItemListContainer: React.FC = () => {
   // Estilos con enfoque sx
   const containerStyles = {
     padding: '8px',
+    marginTop:"20px"
   };
 
   const productStyles = {
@@ -115,11 +130,17 @@ const ItemListContainer: React.FC = () => {
   
 
   return (
-    <Grid container spacing={1} sx={containerStyles}>
+    <Grid container spacing={2} sx={containerStyles}>
+      {/* Título responsivo */}
+      <Grid item xs={12} sx={{ textAlign: "center" }}>
+        <Typography variant="h4">Lo más vendido</Typography>
+      </Grid>
+  
+      {/* Productos más vendidos */}
       {products.map((product) => (
-        <Grid item xs={6} sm={6} md={6} lg={6} key={product.id}>
+        <Grid item xs={6} sm={4} md={4} lg={3} key={product.id}>
           <Card sx={productStyles}>
-          <img src={product.images[0]} alt={product.title} style={productImageStyles} />
+            <img src={product.images[0]} alt={product.title} style={productImageStyles} />
             <CardContent>
               <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
                 {product.title}
@@ -129,11 +150,11 @@ const ItemListContainer: React.FC = () => {
               </Typography>
               <Box sx={buttonContainerStyles}>
                 <Button
-                   onClick={() => handleBuyClick(product)} 
-                   variant="contained"
-                   color="primary"
-                   size="small"
-                   sx={productCartStyles}
+                  onClick={() => handleBuyClick(product)} 
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  sx={productCartStyles}
                 >
                   Comprar
                 </Button>
@@ -154,6 +175,10 @@ const ItemListContainer: React.FC = () => {
       ))}
     </Grid>
   );
+  
+
 };
 
-export default ItemListContainer;
+export default BestSellers;
+
+
