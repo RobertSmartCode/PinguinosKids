@@ -43,7 +43,7 @@ const ProductsFormDesktop: React.FC= ({
     images: [],
     sku: "",
     keywords: [],
-    salesCount: 0,
+    salesCount: "",
     featured: false,
     createdAt: getFormattedDate(),
     elasticity: "",
