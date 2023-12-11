@@ -134,11 +134,17 @@ const Search: React.FC = () => {
  
   return (
     <div>
-    <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
-        Resultados de tu búsqueda.
-      </Typography>
+
+      {searchResults.length > 0 && (
+          <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+            Resultados de tu búsqueda.
+          </Typography>
+        )}
+    
       <Grid container spacing={1} sx={containerStyles}>
+      
         {searchResults.map((product) => (
+         
           <Grid item xs={6} sm={6} md={6} lg={4} key={product.id}>
             <Card sx={productStyles}>
               <img src={product.images[0]} alt={product.title} style={productImageStyles} />
