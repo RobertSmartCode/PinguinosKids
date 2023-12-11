@@ -1,4 +1,4 @@
-import { useContext, } from "react";
+import { useContext, useEffect, useState, } from "react";
 import {
   Typography,
   Box,
@@ -8,57 +8,100 @@ import {
   Button
   
 } from "@mui/material";
-
+import { db } from "../../firebase/firebaseConfig";
 import { CartContext } from '../../context/CartContext';
+import { AuthContext } from "../../context/AuthContext";
 import * as Yup from 'yup';
 import { useFormik } from "formik";
 import { useNavigate } from 'react-router-dom';
+import {CustomerInfo, Order} from "../../type/type"
+import {
+  getDocs,
+  collection,
+  query,
+  where,
+  DocumentData,
+} from "firebase/firestore";
 
-interface CustomerInfo {
-  email: string;
-  receiveOffers: boolean;
-  country: string;
-  identificationDocument: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  isOtherPerson: boolean;
-  otherPersonFirstName: string;
-  otherPersonLastName: string;
-  streetAndNumber: string;
-  department: string;
-  neighborhood: string;
-  city: string;
-  postalCode: string;
-  province: string;
-}
 
 
 const CheckoutForm = () => {
 
     const {getCustomerInformation, setCustomerInformation} = useContext(CartContext)! || {};
-    const currentUser = getCustomerInformation();
+    const [myOrders, setMyOrders] = useState<Order[]>([]);
+    const [initialValuesLoaded, setInitialValuesLoaded] = useState(false);
+    
+    const { user } = useContext(AuthContext)!;
+
+
+    useEffect(() => {
+      const ordersCollection = collection(db, "orders");
+      const ordersFiltered = query(
+        ordersCollection,
+        where("userData.email", "==", user.email)
+      );
+  
+      getDocs(ordersFiltered)
+        .then((res) => {
+          const newArr: Order[] = res.docs.map((order) => ({
+            ...(order.data() as DocumentData),
+            id: order.id,
+          })) as Order[];
+          
+          setMyOrders(newArr);
+        })
+        .catch((error) => console.log(error));
+    }, [user.email]);
+
+    
+
+    const mapOrderToCustomerInfo = (order: Order): CustomerInfo => {
+      
+      const userData = order.userData || {};
+    
+      return {
+        email: userData.email || "",
+        receiveOffers: userData.receiveOffers || false,
+        country: userData.country || "",
+        identificationDocument: userData.identificationDocument || "",
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        phone: userData.phone || "",
+        isOtherPerson: userData.isOtherPerson || false,
+        otherPersonFirstName: userData.otherPersonFirstName || "",
+        otherPersonLastName: userData.otherPersonLastName || "",
+        streetAndNumber: userData.streetAndNumber || "",
+        department: userData.department || "",
+        neighborhood: userData.neighborhood || "",
+        city: userData.city || "",
+        postalCode: userData.postalCode || "",
+        province: userData.province || "",
+       
+      };
+    };
+    
     const navigate = useNavigate();
 
+      // Definir los valores iniciales
     const initialValues: CustomerInfo = {
-      email: currentUser?.email || "",
-      receiveOffers: currentUser?.receiveOffers || false,
-      country: currentUser?.country || "",
-      identificationDocument: currentUser?.identificationDocument || "",
-      firstName: currentUser?.firstName || "",
-      lastName: currentUser?.lastName || "",
-      phone: currentUser?.phone || "",
-      isOtherPerson: currentUser?.isOtherPerson || false,
-      otherPersonFirstName: currentUser?.otherPersonFirstName || "",
-      otherPersonLastName: currentUser?.otherPersonLastName || "",
-      streetAndNumber: currentUser?.streetAndNumber || "",
-      department: currentUser?.department || "",
-      neighborhood: currentUser?.neighborhood || "",
-      city: currentUser?.city || "",
-      postalCode: currentUser?.postalCode || "",
-      province: currentUser?.province || "",
+      email: "",
+      receiveOffers: false,
+      country: "",
+      identificationDocument: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      isOtherPerson: false,
+      otherPersonFirstName: "",
+      otherPersonLastName: "",
+      streetAndNumber: "",
+      department: "",
+      neighborhood: "",
+      city: "",
+      postalCode: "",
+      province: "",
     };
-  
+ 
       const validationSchema = Yup.object().shape({
         email: Yup.string()
           .email("Correo electrónico inválido")
@@ -74,41 +117,77 @@ const CheckoutForm = () => {
         province: Yup.string().required("Campo requerido"),
       });
 
-      const formik = useFormik({
-        initialValues: initialValues,
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-          // Comprobación para asegurarse de que los valores no sean undefined
-          const customerData: CustomerInfo = {
-            email: values.email || "",
-            receiveOffers: values.receiveOffers || false,
-            country: values.country || "",
-            identificationDocument: values.identificationDocument || "",
-            firstName: values.firstName || "",
-            lastName: values.lastName || "",
-            phone: values.phone || "",
-            isOtherPerson: values.isOtherPerson || false,
-            otherPersonFirstName: values.otherPersonFirstName || "",
-            otherPersonLastName: values.otherPersonLastName || "",
-            streetAndNumber: values.streetAndNumber || "",
-            department: values.department || "",
-            neighborhood: values.neighborhood || "",
-            city: values.city || "",
-            postalCode: values.postalCode || "",
-            province: values.province || "",
-            // Agregar otras propiedades con comprobación similar...
-          };
     
-          setCustomerInformation(customerData);
     
-          navigate("/checkout/next");
-        },
+  // Utilizar formik para manejar el formulario
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      const customerData: CustomerInfo = {
+        email: values.email || "",
+        receiveOffers: values.receiveOffers || false,
+        country: values.country || "",
+        identificationDocument: values.identificationDocument || "",
+        firstName: values.firstName || "",
+        lastName: values.lastName || "",
+        phone: values.phone || "",
+        isOtherPerson: values.isOtherPerson || false,
+        otherPersonFirstName: values.otherPersonFirstName || "",
+        otherPersonLastName: values.otherPersonLastName || "",
+        streetAndNumber: values.streetAndNumber || "",
+        department: values.department || "",
+        neighborhood: values.neighborhood || "",
+        city: values.city || "",
+        postalCode: values.postalCode || "",
+        province: values.province || "",
+      };
+
+      setCustomerInformation(customerData);
+
+      navigate("/checkout/next");
+    },
+  });
+
+// Verificar si los valores iniciales han sido cargados antes de inicializar el formulario
+useEffect(() => {
+  if (initialValuesLoaded) {
+    const currentUser =
+      user && myOrders.length > 0
+        ? mapOrderToCustomerInfo(myOrders[0])
+        : (getCustomerInformation() as CustomerInfo) || {};
+
+    // Actualizar los valores iniciales solo si el formulario no ha sido tocado
+    if (!formik.touched.email) {
+      // Establecer el correo electrónico en el formulario
+      formik.setValues({
+        email: user && myOrders.length === 0 ? user.email : currentUser.email || "",
+        receiveOffers: currentUser.receiveOffers || false,
+        country: currentUser.country || "",
+        identificationDocument: currentUser.identificationDocument || "",
+        firstName: currentUser.firstName || "",
+        lastName: currentUser.lastName || "",
+        phone: currentUser.phone || "",
+        isOtherPerson: currentUser.isOtherPerson || false,
+        otherPersonFirstName: currentUser.otherPersonFirstName || "",
+        otherPersonLastName: currentUser.otherPersonLastName || "",
+        streetAndNumber: currentUser.streetAndNumber || "",
+        department: currentUser.department || "",
+        neighborhood: currentUser.neighborhood || "",
+        city: currentUser.city || "",
+        postalCode: currentUser.postalCode || "",
+        province: currentUser.province || "",
       });
+    }
+  }
+}, [user, myOrders, getCustomerInformation, formik.touched.email, initialValuesLoaded]);
 
-  
+// Marcar que los valores iniciales han sido cargados
+useEffect(() => {
+  setInitialValuesLoaded(true);
+}, []);
 
-  
-  
+
 
   const titleStyle = {
     fontWeight: "bold",

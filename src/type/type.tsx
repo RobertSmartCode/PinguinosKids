@@ -50,6 +50,42 @@ export  interface ProductsFormProps {
     updateColors: (newColors: { color: string; sizes: string[]; quantities: number[] }[]) => void;
   }
 
+export interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
+}
+
+
+
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  description: string;
+  // Otros campos relevantes para un método de pago
+}
+
+export interface CustomerInfo {
+  email: string;
+  receiveOffers: boolean;
+  country: string;
+  identificationDocument: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  isOtherPerson: boolean;
+  otherPersonFirstName: string;
+  otherPersonLastName: string;
+  streetAndNumber: string;
+  department: string;
+  neighborhood: string;
+  city: string;
+  postalCode: string;
+  province: string;
+
+}
+
 export interface Order {
   id: string;
   date: Date;
@@ -63,15 +99,21 @@ export interface Order {
   shippingCost: number;
   total: number;
   userData: {
-    phone: string;
-    postalCode:number;
-    email:string;
-    city:string
+    email: string;
+    receiveOffers: boolean;
+    country: string;
     identificationDocument: string;
-    otherPersonLastName: string;
-    isOtherPerson: boolean;
     firstName: string;
     lastName: string;
-    // Agrega otros campos según la estructura de userData
+    phone: string;
+    isOtherPerson: boolean;
+    otherPersonFirstName: string;
+    otherPersonLastName: string;
+    streetAndNumber: string;
+    department: string;
+    neighborhood: string;
+    city: string;
+    postalCode: string;
+    province: string;
   };
 }

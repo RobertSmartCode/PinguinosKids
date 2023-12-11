@@ -7,61 +7,53 @@ import {
   Grid,
   Button,
   Box,
-  
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; 
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { CartContext } from "../../context/CartContext";
 
-interface ShippingMethod {
-  id: string;
-  name: string;
-  price: number;
-  selected: boolean;
-}
+import { ShippingMethod } from "../../type/type";
 
-
+const SHIPPING_METHODS_STORAGE_KEY = "shippingMethods";
 
 const ShippingMethodCheckout = () => {
- 
+  const { updateShippingInfo, getSelectedShippingMethod } =
+    useContext(CartContext)!;
 
-  const { updateShippingInfo, getSelectedShippingMethod} = useContext(CartContext)!;
+  const initialSelectedMethod = getSelectedShippingMethod();
 
-
-  const initialSelectedMethod= getSelectedShippingMethod()
- 
   const [methods, setMethods] = useState<ShippingMethod[]>([]);
 
-  const [selectedMethod, setSelectedMethod] = useState<ShippingMethod | null>(initialSelectedMethod);
- 
- 
- const onSelectMethod= (method: ShippingMethod) => {
-  setSelectedMethod(method);
-   updateShippingInfo(method, method.price);
- 
- };
+  const onSelectMethod = (method: ShippingMethod) => {
+    updateShippingInfo(method, method.price);
+  };
 
- 
-
-
-  if(selectedMethod){
-
-    // Esto es para que Typescript da error 
-  }
-  
   const [showAllOptions, setShowAllOptions] = useState(false);
 
   useEffect(() => {
-    fetchShippingMethods();
+    const storedMethods = JSON.parse(
+      localStorage.getItem(SHIPPING_METHODS_STORAGE_KEY) || "[]"
+    );
+
+    if (storedMethods.length > 0) {
+      setMethods(storedMethods);
+    } else {
+      fetchShippingMethods();
+    }
   }, []);
 
-  if (initialSelectedMethod) {
-    const initialMethod = methods.find((m) => m.id === initialSelectedMethod.id);
-    if (initialMethod) {
-      initialMethod.selected = true;
+  useEffect(() => {
+    if (initialSelectedMethod) {
+      const initialMethod = methods.find(
+        (m) => m.id === initialSelectedMethod.id
+      );
+      if (initialMethod) {
+        initialMethod.selected = true;
+        saveMethodsToLocalStorage();
+      }
     }
-  }
+  }, [initialSelectedMethod, methods]);
 
   const fetchShippingMethods = async () => {
     try {
@@ -93,13 +85,17 @@ const ShippingMethodCheckout = () => {
     }));
     setMethods(updatedMethods);
 
-    setSelectedMethod(method);
     onSelectMethod(method);
 
-    // Actualizar showAllOptions según la selección del usuario
-    setShowAllOptions(false); // Establecer en falso para mostrar solo el método seleccionado
+    setShowAllOptions(false);
   };
 
+  const saveMethodsToLocalStorage = () => {
+    localStorage.setItem(
+      SHIPPING_METHODS_STORAGE_KEY,
+      JSON.stringify(methods)
+    );
+  };
 
   return (
     <Box>
@@ -108,7 +104,11 @@ const ShippingMethodCheckout = () => {
           <Typography
             variant="h6"
             align="center"
-            style={{ fontWeight: "bold", color: "black", cursor: "pointer" }}
+            style={{
+              fontWeight: "bold",
+              color: "black",
+              cursor: "pointer",
+            }}
             onClick={(e) => {
               e.stopPropagation();
               setShowAllOptions(false);
@@ -121,7 +121,7 @@ const ShippingMethodCheckout = () => {
 
       <Grid container spacing={0}>
         {methods.map((method) => (
-          <Grid item xs={12} sm={12} md={12} lg={12}  key={method.id}>
+          <Grid item xs={12} sm={12} md={12} lg={12} key={method.id}>
             {showAllOptions || method.selected ? (
               <Card
                 onClick={() => handleMethodClick(method)}
@@ -137,9 +137,19 @@ const ShippingMethodCheckout = () => {
                 }}
               >
                 <CardContent
-                  style={{ flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                  style={{
+                    flexGrow: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     <Checkbox
                       checked={method.selected}
                       onChange={() => handleMethodClick(method)}
@@ -148,12 +158,20 @@ const ShippingMethodCheckout = () => {
                     <Typography
                       variant="body1"
                       component="div"
-                      style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
                       {method.name}
                     </Typography>
                   </div>
-                  <Typography variant="body1" color="text.secondary" style={{ paddingRight: "35px" }}>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    style={{ paddingRight: "35px" }}
+                  >
                     ${method.price}
                   </Typography>
                 </CardContent>
@@ -161,13 +179,27 @@ const ShippingMethodCheckout = () => {
             ) : null}
           </Grid>
         ))}
-  
+
         {!showAllOptions && (
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", margin: "0", padding: "0" }}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              margin: "0",
+              padding: "0",
+            }}
+          >
             <Button
               variant="outlined"
               onClick={() => setShowAllOptions(true)}
-              sx={{ border: "none", margin: "0", padding: "0", textTransform: "none" }}
+              sx={{
+                border: "none",
+                margin: "0",
+                padding: "0",
+                textTransform: "none",
+              }}
             >
               Más opciones <ExpandMoreIcon />
             </Button>
@@ -176,8 +208,6 @@ const ShippingMethodCheckout = () => {
       </Grid>
     </Box>
   );
-  
-  
 };
 
 export default ShippingMethodCheckout;

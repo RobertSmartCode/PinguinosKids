@@ -3,7 +3,7 @@ import Home from "../pages/home/Home";
 import ItemDetail from "../components/pageComponents/itemDetail/ItemDetail";
 import Shop from "../pages/shop/Shop";
 import UserOrders from "../pages/UserAccount/UserAccount";
-import Search from "../pages/search/Search";
+import SearchPage from "../pages/search/SearchPage";
 
 
 interface Route {
@@ -36,6 +36,6 @@ export const routes: Route[] = [
   {
     id: "search",
     path: "/search",
-    Element: Search,
+    Element: SearchPage,
   }
 ];

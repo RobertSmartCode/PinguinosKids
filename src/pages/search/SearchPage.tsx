@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, } from "react";
-import { db } from "../../../../../../firebase/firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
+import { collection, query, where, getDocs, } from "firebase/firestore";
 import { Grid, Card, CardContent, Typography, Button, IconButton, Box } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from "react-router-dom";
-import { useSearchContext } from "../../../../../../context/SearchContext"; 
-import { CartContext } from "../../../../../../context/CartContext";
-import { Product, CartItem } from '../../../../../../type/type';
+import { useSearchContext } from "../../context/SearchContext"; 
+import { CartContext } from "../../context/CartContext";
+import { Product, CartItem } from '../../type/type';
 
 
-const Search: React.FC = () => {
+const SearchPage: React.FC = () => {
  
   const { addToCart } = useContext(CartContext)!; 
   const { searchKeyword, searchResults, setSearchResults } = useSearchContext()!;
@@ -22,8 +22,14 @@ const Search: React.FC = () => {
         const productsCollection = collection(db, 'products');
         const searchQuery = query(
           productsCollection,
-          where("title", ">=", searchKeyword),
-          where("title", "<=", searchKeyword + "\uf8ff")
+          where("title", ">=", searchKeyword ),
+          
+          where("title", "<=", (searchKeyword + "\uf8ff") )
+          
+
+
+          
+
         );
         const querySnapshot = await getDocs(searchQuery);
 
@@ -132,53 +138,62 @@ const Search: React.FC = () => {
    
   };
  
+
   return (
     <div>
-    <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
-        Resultados de tu búsqueda.
-      </Typography>
-      <Grid container spacing={1} sx={containerStyles}>
-        {searchResults.map((product) => (
-          <Grid item xs={6} sm={6} md={6} lg={4} key={product.id}>
-            <Card sx={productStyles}>
-              <img src={product.images[0]} alt={product.title} style={productImageStyles} />
-              <CardContent>
-                <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
-                  {product.title}
-                </Typography>
-                <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
-                  Precio: ${product.unit_price}
-                </Typography>
-                <Box sx={buttonContainerStyles}>
-                  <Button
-                    onClick={() => handleBuyClick(product)}
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={productCartStyles}
-                  >
-                    Comprar
-                  </Button>
-                  <IconButton
-                    component={Link}
-                    to={`/itemDetail/${product.id}`}
-                    aria-label="Ver"
-                    color="secondary"
-                    size="small"
-                    sx={productDetailStyles}
-                  >
-                    <VisibilityIcon sx={iconStyles} />
-                  </IconButton>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      {searchResults.length > 0 ? (
+       <div>
+       <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+           Resultados de tu búsqueda.
+         </Typography>
+         <Grid container spacing={1} sx={containerStyles}>
+           {searchResults.map((product) => (
+             <Grid item xs={6} sm={6} md={3} lg={3} key={product.id}>
+               <Card sx={productStyles}>
+                 <img src={product.images[0]} alt={product.title} style={productImageStyles} />
+                 <CardContent>
+                   <Typography variant="subtitle1" gutterBottom sx={productTitleStyles}>
+                     {product.title}
+                   </Typography>
+                   <Typography variant="subtitle2" color="textSecondary" sx={productPriceStyles}>
+                     Precio: ${product.unit_price}
+                   </Typography>
+                   <Box sx={buttonContainerStyles}>
+                     <Button
+                       onClick={() => handleBuyClick(product)}
+                       variant="contained"
+                       color="primary"
+                       size="small"
+                       sx={productCartStyles}
+                     >
+                       Comprar
+                     </Button>
+                     <IconButton
+                       component={Link}
+                       to={`/itemDetail/${product.id}`}
+                       aria-label="Ver"
+                       color="secondary"
+                       size="small"
+                       sx={productDetailStyles}
+                     >
+                       <VisibilityIcon sx={iconStyles} />
+                     </IconButton>
+                   </Box>
+                 </CardContent>
+               </Card>
+             </Grid>
+           ))}
+         </Grid>
+       </div>
+       ) : (
+        <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+          No hubo resultados 
+        </Typography>
+      )}
     </div>
- 
   );
-  
 };
 
-export default Search;
+export default SearchPage;
+
+

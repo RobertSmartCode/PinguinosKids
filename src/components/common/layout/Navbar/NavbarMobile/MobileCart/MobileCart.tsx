@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from '@mui/material/IconButton';
@@ -14,24 +14,25 @@ import ShippingMethods from './ShippingMethods/ShippingMethods';
 import { Button } from '@mui/material';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-
-export interface ShippingMethod {
-  id: string;
-  name: string;
-  price: number;
-  selected: boolean;
-}
+import {ShippingMethod} from "../../../../../../type/type"
 
 
 
 const MobileCart: React.FC = () => {
   const [cartOpen, setCartOpen] = useState(false);
  
+  
+
+
+  const { cart, getTotalPrice, getTotalQuantity,  updateShippingInfo, getSelectedShippingMethod } = useContext(CartContext)! ?? {};
+
+
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
 
-
-  const { cart, getTotalPrice, getTotalQuantity,  updateShippingInfo } = useContext(CartContext)! ?? {};
+  useEffect(() => {
+    const initialSelectedMethod = getSelectedShippingMethod();
+    setSelectedShippingMethod(initialSelectedMethod);
+  }, [getSelectedShippingMethod]);
 
   const isDesktop = useMediaQuery('(min-width: 768px)');
 

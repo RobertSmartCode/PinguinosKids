@@ -1,12 +1,29 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CloseIcon from "@mui/icons-material/Close";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, Typography } from "@mui/material";
+import ShippingMethods from "../../common/layout/Navbar/NavbarMobile/MobileCart/ShippingMethods/ShippingMethods";
+import {ShippingMethod} from "../../../type/type"
+import {CartContext} from "../../../context/CartContext";
 
 const ShippingMethodsInfo: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 600px)');
+
+  const { updateShippingInfo, getSelectedShippingMethod} = useContext(CartContext)!;
+
+
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
+
+  useEffect(() => {
+    const initialSelectedMethod = getSelectedShippingMethod();
+    setSelectedShippingMethod(initialSelectedMethod);
+  }, [getSelectedShippingMethod]);
+
+
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -14,6 +31,13 @@ const ShippingMethodsInfo: React.FC = () => {
 
   const handleCloseDrawer = () => {
     setIsOpen(false);
+  };
+
+
+  const handleShippingMethodSelect = (method: ShippingMethod) => {
+    setSelectedShippingMethod(method);
+    updateShippingInfo(method, method.price);
+  
   };
 
   // Colores personalizados
@@ -54,7 +78,13 @@ const ShippingMethodsInfo: React.FC = () => {
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        <Typography variant="subtitle1" onClick={toggleDrawer}>
+        <Typography
+         variant="subtitle1" 
+         onClick={toggleDrawer}
+         sx={{
+          cursor: 'pointer',
+        }}
+         >
           Métodos de Envío
         </Typography> 
         <IconButton onClick={toggleDrawer}>
@@ -64,20 +94,20 @@ const ShippingMethodsInfo: React.FC = () => {
       </Box>
 
       <Drawer
-        anchor="left"
-        open={isOpen}
-        onClose={handleCloseDrawer}
-        sx={{
-          display: { xs: "block" },
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: "100%",
-            height: "100%",
-            zIndex: 1300,
-          },
-        }}
-      >
+      anchor="left"
+      open={isOpen}
+      onClose={handleCloseDrawer}
+      sx={{
+        display: { xs: "block" },
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          boxSizing: "border-box",
+          width: isMobile ? "100%" : 350, // Ajusta el ancho según sea necesario
+          height: "100%",
+          zIndex: 1300,
+        },
+      }}
+    >
         <Box sx={topBarStyles}>
           <Typography sx={shippingTextStyles}>Métodos de Envío</Typography>
           <IconButton
@@ -88,10 +118,10 @@ const ShippingMethodsInfo: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </Box>
-        <Typography variant="body1">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac
-          nulla vel ligula tristique vestibulum.
-        </Typography>
+        <ShippingMethods
+              onSelectMethod={handleShippingMethodSelect}
+              initialSelectedMethod={selectedShippingMethod}
+            />
       </Drawer>
     </Box>
   );

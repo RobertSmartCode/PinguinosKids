@@ -3,9 +3,13 @@ import Drawer from "@mui/material/Drawer";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Typography } from "@mui/material";
+import useMediaQuery from '@mui/material/useMediaQuery';
+import ProductDetailsShow from "./ProductDetailsShow";
 
 const ProductDetailsInfo: React.FC = () => {
+
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 600px)');
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -53,13 +57,24 @@ const ProductDetailsInfo: React.FC = () => {
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        <Typography variant="subtitle1" onClick={toggleDrawer}>
+        <Typography
+         variant="subtitle1"
+          onClick={toggleDrawer}
+          sx={{
+            cursor: 'pointer',
+          }}
+          >
           Detalles del Producto
         </Typography>
-        <InfoIcon onClick={toggleDrawer} />
+        <InfoIcon 
+        onClick={toggleDrawer}
+        sx={{
+          cursor: 'pointer',
+        }}
+        />
       </Box>
 
-      <Drawer
+        <Drawer
         anchor="left"
         open={isOpen}
         onClose={handleCloseDrawer}
@@ -68,7 +83,7 @@ const ProductDetailsInfo: React.FC = () => {
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
-            width: "100%",
+            width: isMobile ? "100%" : 350, // Ajusta el ancho según sea necesario
             height: "100%",
             zIndex: 1300,
           },
@@ -82,10 +97,7 @@ const ProductDetailsInfo: React.FC = () => {
             sx={closeButtonStyles}
           />
         </Box>
-        <Typography variant="body1">
-          Aquí puedes agregar información sobre las dimensiones, el material y
-          otros detalles relevantes del producto.
-        </Typography>
+        <ProductDetailsShow/>
       </Drawer>
     </Box>
   );

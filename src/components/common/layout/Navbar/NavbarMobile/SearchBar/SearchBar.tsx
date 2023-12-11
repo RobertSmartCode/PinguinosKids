@@ -7,6 +7,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Box, Toolbar, Typography } from "@mui/material";
 
 import Search from "./Search"; 
+import { useNavigate } from 'react-router-dom';
 import { useSearchContext } from "../../../../../../context/SearchContext"; 
 
 
@@ -18,6 +19,7 @@ const SearchBar: React.FC = () => {
   const {updateSearchKeyword } = useSearchContext()!;
   const [inputValue, setInputValue] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
@@ -25,7 +27,7 @@ const SearchBar: React.FC = () => {
 
 
   useEffect(() => {
-    // Actualiza la palabra clave de búsqueda al valor actual de inputValue
+    
     updateSearchKeyword(inputValue);
   }, [inputValue, updateSearchKeyword]);
 
@@ -33,14 +35,13 @@ const SearchBar: React.FC = () => {
 
   
   const handleSearchClick = () => {
-    // Maneja la lógica de búsqueda utilizando la palabra clave y cierra el cuadro de búsqueda
-    
-    
+    setIsSearchOpen(!isSearchOpen);
+    navigate('/search');
   };
 
 
   const handleCloseClick = () => {
-    setInputValue(""); // Limpiar el valor del campo de búsqueda al cerrar
+    setInputValue(""); 
     toggleSearch();
   };
 
@@ -95,19 +96,20 @@ const SearchBar: React.FC = () => {
   };
 
   const inputStyles = {
-    border: `1px solid ${customColors.secondary.main}`, // Usando el color personalizado
+    border: `1px solid ${customColors.primary.main}`, // Usando el color personalizado
     background: customColors.secondary.main, // Usando el color personalizado
-    borderRadius: "8px",
-    padding: "8px",
-  };
+    padding: "3px",
+    borderRadius: "4px 0 0 4px ",
+  }
 
   const buttonStyles = {
     backgroundColor: customColors.primary.main, // Usando el color personalizado
     borderRadius: "0 4px 4px 0",
   };
 
+  
   const iconStyles = {
-    color: customColors.secondary.main, // Usando el color personalizado
+    color: customColors.secondary.main
   };
 
   return (
@@ -168,13 +170,13 @@ const SearchBar: React.FC = () => {
             sx={inputStyles}
           />
           <IconButton
-            color="secondary"
             aria-label="search"
             onClick={handleSearchClick}
-            sx={buttonStyles}
+            style={buttonStyles}
           >
-            <SearchIcon sx={iconStyles} />
+            <SearchIcon style={iconStyles} />
           </IconButton>
+
         </Box>
         <Search/>
       </Drawer>

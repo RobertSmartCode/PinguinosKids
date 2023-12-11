@@ -1,9 +1,11 @@
 import React, { createContext, useState, ReactNode, useContext } from "react";
-
+import { Product } from "../type/type";
 // Definir la interfaz para el contexto de búsqueda
 interface SearchContextData {
   searchKeyword: string;
   updateSearchKeyword: (newSearchKeyword: string) => void;
+  searchResults: Product[];
+  setSearchResults: React.Dispatch<React.SetStateAction<Product[]>>;
 }
 
 // Crear el contexto de búsqueda
@@ -17,6 +19,7 @@ interface SearchContextComponentProps {
 // Crear el componente de contexto de búsqueda
 const SearchContextComponent: React.FC<SearchContextComponentProps> = ({ children }) => {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
   const updateSearchKeyword = (newSearchKeyword: string) => {
     setSearchKeyword(newSearchKeyword);
@@ -25,6 +28,8 @@ const SearchContextComponent: React.FC<SearchContextComponentProps> = ({ childre
   const data: SearchContextData = {
     searchKeyword,
     updateSearchKeyword,
+    searchResults,
+    setSearchResults,
   };
 
   return <SearchContext.Provider value={data}>{children}</SearchContext.Provider>;
